@@ -1,13 +1,13 @@
-/*  Name: Dang Truong, Andrew Pham
-    Implement selection sort, insertion sort, merge sort and quick sort.
+/*  Implement selection sort, insertion sort, merge sort and quick sort.
     Compute the running time of each sorting algorithm and output the result
     into a csv file for graphing. */
 
 #include <iostream>
-#include <vector.h>
+#include <vector>
 #include <climits>
 #include <fstream>
 #include <sys/time.h>
+using namespace std;
 
 #define MAXLENGTH 100000
 #define STEP 1000
@@ -34,7 +34,7 @@ void swap(int &x, int &y) {
     Parameters: a list of integers
     
     Return values: None */
-void selectionSort(Vector<int> &list) {
+void selectionSort(vector<int> &list) {
     int n = list.size();
     for (int i = 0; i < n; i++) {
         // pos will be the position of the number that will be inserted
@@ -56,7 +56,7 @@ void selectionSort(Vector<int> &list) {
     correct position to insert the key
     Parameters: a list of numbers
     Return values: None */
-void insertionSort(Vector<int> &list) {
+void insertionSort(vector<int> &list) {
     int n = list.size();
     for (int i = 1; i < n; i++) {
         int key = list[i];
@@ -81,24 +81,24 @@ void insertionSort(Vector<int> &list) {
     and the left boundary of the right sublist)
     - right: the right boundary of the main list (also the right boundary of the right sublist) 
     Return values: None */
-void merge(Vector<int> &list, int left, int mid, int right) {
+void merge(vector<int> &list, int left, int mid, int right) {
     // Create a sorted left-sublist
-    Vector<int> leftList;
+    vector<int> leftList;
     for (int i = left; i < mid + 1; i++) {
-        leftList.add(list[i]);
+        leftList.push_back(list[i]);
     }
 
     /* Add an infinity to handle the case when one list is out of elements,
     all elements in the other list will be smaller than the infinity, 
     so we need only one pass to merge two lists into one sorted list */
-    leftList.add(INT_MAX);
+    leftList.push_back(INT_MAX);
 
 
-    Vector<int> rightList;
+    vector<int> rightList;
     for (int i = mid + 1; i < right + 1; i++) {
-        rightList.add(list[i]);
+        rightList.push_back(list[i]);
     }
-    rightList.add(INT_MAX);
+    rightList.push_back(INT_MAX);
 
     int i = 0, j = 0;
     for (int k = left; k < right + 1; k++) {
@@ -119,7 +119,7 @@ void merge(Vector<int> &list, int left, int mid, int right) {
     - left: the left boundary of the sublist
     - right: the right boundary of the sublist 
     Return values: None */
-void merge_sort(Vector<int> &list, int left, int right) {
+void merge_sort(vector<int> &list, int left, int right) {
     if (left < right) {
         // Avoid integer overflow
         int mid = left + (right - left) / 2;
@@ -132,7 +132,7 @@ void merge_sort(Vector<int> &list, int left, int right) {
 /* Wrapper function for merge sort
     Parameters: a list of number
     Return values: None */
-void mergeSort(Vector<int> &list) {
+void mergeSort(vector<int> &list) {
     merge_sort(list, 0, list.size() - 1);
 }
 
@@ -147,7 +147,7 @@ void mergeSort(Vector<int> &list) {
     - left: the left boundary of the list
     - right: the right boundary of the list 
     Return values: the index of the pivot */
-int partition(Vector<int> &list, int left, int right) {
+int partition(vector<int> &list, int left, int right) {
     int pivot = list[right];
     int i = left - 1;
     for (int j = left; j < right; j++) {
@@ -171,7 +171,7 @@ int partition(Vector<int> &list, int left, int right) {
     - left: the left boundary of the list
     - right: the right boundary of the list 
     Return values: None */
-void quick_sort(Vector<int> &list, int left, int right) {
+void quick_sort(vector<int> &list, int left, int right) {
     if (left < right) {
         // Find the position of a pivot
         int pivotPos = partition(list, left, right);
@@ -183,7 +183,7 @@ void quick_sort(Vector<int> &list, int left, int right) {
 /* Wrapper function for quick sort 
     Parameters: a list of number 
     Return value: None */
-void quickSort(Vector<int> &list) {
+void quickSort(vector<int> &list) {
     quick_sort(list, 0, list.size() - 1);
 }
 
@@ -193,7 +193,7 @@ int main() {
     timeval timeBefore, timeAfter;
     long diffSeconds, diffUSeconds;
     double time;
-    Vector<int> list, oldList;
+    vector<int> list, oldList;
 
     std::ofstream outputFile("test-result.csv");
 
@@ -210,7 +210,7 @@ int main() {
         // Generate a list of random numbers
         int n = oldList.size();
         for (int i = 0; i < size - n; i++) {
-            oldList.add(rand());
+            oldList.push_back(rand());
         }
 
         // Compute running time of selection sort
