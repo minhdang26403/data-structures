@@ -1,4 +1,3 @@
-// Authors: Dang and Ava
 // list.cpp
 // This is a doubly linked list implementation of a List class.
 

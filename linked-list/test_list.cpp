@@ -1,4 +1,3 @@
-// Authors: Dang and Ava
 // test_list.cpp
 
 #include "list.h"
