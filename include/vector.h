@@ -2,7 +2,7 @@
 #define VECTOR_H
 
 #include <stdexcept>
-#include <cstdio>
+#include <cstdlib>
 
 namespace ds {
 template<typename T>
@@ -36,7 +36,7 @@ class Vector {
    * Adds an element to the end of the vector
    * @param value the value of the element to add
    */
-  void push_back(const T& value) {
+  void PushBack(const T& value) {
     insert(size_, value);
   }
 
@@ -44,14 +44,20 @@ class Vector {
    * Gets the size of the vector
    * @return the current size of the vector
    */
-  std::size_t size() const noexcept { return size_; };
+  std::size_t Size() const noexcept { return size_; };
+
+  /**
+   * Checks whether the vector is empty
+   * @return true if the vector is empty; false otherwise
+   */
+  bool IsEmpty() const noexcept { return size_ == 0; };
 
   /**
    * Finds the index of an element
    * @param value the value of the element
    * @return the index of the element if exists; otherwise -1
    */
-  int index(const T& value) {
+  int Find(const T& value) {
     for (int i = 0; i < size_; ++i) {
       if (array_[i] == value) {
         return i;
@@ -65,7 +71,7 @@ class Vector {
    * @param index the position to insert the element
    * @param value the value of the element
    */
-  void insert(int index, const T& value) {
+  void Insert(int index, const T& value) {
     if (index < 0 || index > size_) {
       throw std::out_of_range();
     }
@@ -83,7 +89,7 @@ class Vector {
    * Removes an element at the specified position
    * @param index the position of the element to be removed
    */
-  void remove(int index) {
+  void Remove(int index) {
     if (index < 0 || index > size_) {
       throw std::out_of_range();
     }
@@ -122,8 +128,8 @@ class Vector {
   T* array_;
 
   /**
-   * @brief 
-   * 
+   * Creates a deep copy of the source Vector object
+   * @param src the source object to copy from
    */
   void DeepCopy(const Vector<T>& src) {
     capacity_ = src.capacity_;
@@ -135,8 +141,7 @@ class Vector {
   }
 
   /**
-   * @brief 
-   * 
+   * Expands the capacity of the vector
    */
   void ExpandCapacity() {
     T* old_array = array_;
