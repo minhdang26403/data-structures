@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 namespace ds {
-template<typename T>
+template<typename ValueType>
 class Vector {
  public:
  /**
@@ -14,14 +14,14 @@ class Vector {
   Vector() {
     capacity_ = INITIAL_CAPACITY;
     size_ = 0;
-    array_ = new T[capacity_];
+    array_ = new ValueType[capacity_];
   }
 
   /**
    * Copy constructor
    * @param src the source object to copy from
    */
-  Vector(const Vector<T>& src) {
+  Vector(const Vector<ValueType>& src) {
     DeepCopy(src);
   }
 
@@ -36,7 +36,7 @@ class Vector {
    * Adds an element to the end of the vector
    * @param value the value of the element to add
    */
-  void PushBack(const T& value) {
+  void PushBack(const ValueType& value) {
     insert(size_, value);
   }
 
@@ -57,7 +57,7 @@ class Vector {
    * @param value the value of the element
    * @return the index of the element if exists; otherwise -1
    */
-  int Find(const T& value) {
+  int Find(const ValueType& value) {
     for (int i = 0; i < size_; ++i) {
       if (array_[i] == value) {
         return i;
@@ -71,7 +71,7 @@ class Vector {
    * @param index the position to insert the element
    * @param value the value of the element
    */
-  void Insert(int index, const T& value) {
+  void Insert(int index, const ValueType& value) {
     if (index < 0 || index > size_) {
       throw std::out_of_range();
     }
@@ -104,7 +104,7 @@ class Vector {
    * @param index the position of the element
    * @return A reference to the element
    */
-  T& operator[](int index) {
+  ValueType& operator[](int index) {
     return array_[index];
   }
 
@@ -113,7 +113,7 @@ class Vector {
    * @param src the source object to assign
    * @return a reference to the calling object
    */
-  T& operator=(const T& src) {
+  ValueType& operator=(const T& src) {
     if (this != &src) {
       delete []array_;
       DeepCopy(src);
@@ -125,16 +125,16 @@ class Vector {
   static const std::size_t INITIAL_CAPACITY = 10;
   std::size_t capacity_;
   std::size_t size_;
-  T* array_;
+  ValueType* array_;
 
   /**
    * Creates a deep copy of the source Vector object
    * @param src the source object to copy from
    */
-  void DeepCopy(const Vector<T>& src) {
+  void DeepCopy(const Vector<ValueType>& src) {
     capacity_ = src.capacity_;
     size_ = src.size_;
-    array_ = new T[capacity_];
+    array_ = new ValueType[capacity_];
     for (int i = 0; i < size_; ++i) {
       array_[i] = src.array_[i];
     }
@@ -144,9 +144,9 @@ class Vector {
    * Expands the capacity of the vector
    */
   void ExpandCapacity() {
-    T* old_array = array_;
+    ValueType* old_array = array_;
     capacity_ *= 2;
-    array_ = new T[capacity_];
+    array_ = new ValueType[capacity_];
     for (int i = 0; i < size_; ++i) {
       array_[i] = old_array[i];
     }
