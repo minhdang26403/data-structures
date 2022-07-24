@@ -61,6 +61,10 @@ class Vector {
     src.Swap(*this);
   }
 
+  /**
+   * Construct a new Vector object with an initializer list
+   * @param init the initializer list
+   */
   Vector(std::initializer_list<Type> init) 
     : array_{new Type[init.size()]}, capacity_{init.size()}, size_{init.size()}
   { 
@@ -164,30 +168,14 @@ class Vector {
    * @param value the value of the element
    */
   void Insert(SizeType index, const Type& value) {
-    if (index < 0 || index > size_) {
-      throw std::out_of_range();
-    }
-    if (size_ == capacity_) {
-      ExpandCapacity();
-    }
-    for (SizeType i = size_; i > index; --i) {
-      array_[i] = array_[i - 1];
-    }
+    PrepareForInsertion();
     array_[index] = value;
     ++size_;
   }
 
   /** Overload of insert method supporting move semantics */
   void Insert(SizeType index, Type&& value) {
-    if (index < 0 || index > size_) {
-      throw std::out_of_range("Index out of range");
-    }
-    if (size_ == capacity_) {
-      ExpandCapacity();
-    }
-    for (SizeType i = size_; i > index; --i) {
-      array_[i] = array_[i - 1];
-    }
+    PrepareForInsertion();
     array_[index] = std::move(value);
     ++size_;
   }
@@ -231,7 +219,22 @@ class Vector {
   }
 
  private:
-  
+  /**
+   * Checks for index boundary, reallocates the array (if needed), and shifts elements
+   */
+  void PrepareForInsertion() {
+    if (index < 0 || index > size_) {
+      throw std::out_of_range("Index out of range");
+    }
+    if (size_ == capacity_) {
+      ExpandCapacity();
+    }
+    for (SizeType i = size_; i > index; --i) {
+      array_[i] = array_[i - 1];
+    }
+  }
+
+
   /**
    * Validate the index of an element
    * @param index the position of the element
@@ -263,6 +266,7 @@ class Vector {
     std::copy(old_array, old_array + size_, array_);
     delete []old_array;
   }
+
   /** The array holding elemets */
   Type* array_{};
   /** The maximum capacity of the array */
