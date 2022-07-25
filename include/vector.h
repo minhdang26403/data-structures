@@ -2,8 +2,8 @@
 #define VECTOR_H_
 
 #include <algorithm>
-#include <stdexcept>
 #include <cstdlib>
+#include <stdexcept>
 
 #include "./config.h"
 
@@ -13,16 +13,16 @@ class Vector {
  public:
   /** Type aliases */
   using ValueType = Type;
+  using SizeType = std::size_t;
   using Reference = ValueType&;
   using ConstReference = const ValueType&;
   using Iterator = Type*;
   using ConstIterator = const Type*;
-  using SizeType = std::size_t;
 
   /**
   * Default constructor
   */
-  Vector() : array_{new Type[INITIAL_CAPACITY]} {}
+  Vector() = default;
 
   /**
    * Construct a new Vector object of `count` elements with `value` values
