@@ -16,4 +16,4 @@ vector_test: $(TESTDIR)/vector_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 clean:
-	rm -rf $(PROGRAMS) *.o
+	rm -rf $(PROGRAMS) *.o *.a
