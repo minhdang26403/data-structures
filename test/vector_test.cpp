@@ -4,8 +4,7 @@
 #include <string>
 
 template<typename Type>
-std::ostream& operator<<(std::ostream& s, const ds::Vector<Type>& v) 
-{
+std::ostream& operator<<(std::ostream& s, const ds::Vector<Type>& v) {
     s.put('[');
     char comma[3] = {'\0', ' ', '\0'};
     for (uint32_t i = 0; i < v.Size(); ++i) {
@@ -56,8 +55,7 @@ void TestAssignment() {
   std::cout << "Assignment test passed" << '\n';
 }
 
-void TestInsert()
-{ 
+void TestInsert() { 
   ds::Vector<std::string> data1;
 	data1.PushBack("abc");
 	assert(data1[0] == "abc");
@@ -83,8 +81,7 @@ void TestInsert()
   std::cout << "Insert test passed" << '\n';
 }
 
-void TestRemove()
-{
+void TestRemove() {
 	ds::Vector<std::string> data;
 	data.Insert(0, "abc");
 	data.Insert(1, "def");
@@ -98,12 +95,30 @@ void TestRemove()
   std::cout << "Remove test passed" << '\n';
 }
 
+void TestIterator() {
+  ds::Vector<std::string> data1 = {"ab", "cd", "ef", "gh"};
+  for (std::string s : data1) {
+    std::cout << s << '\n';
+  }
+  ds::Vector<int> data2;
+  for (int i = 0; i < 10; ++i) {
+    data2.PushBack(i);
+  }
+  std::cout << data2 << '\n';
+  ds::Vector<int> data3;
+  for (ds::Vector<int>::Iterator it = data2.begin(); it != data2.end(); ++it) {
+    data3.PushBack(*it);
+  }
+  std::cout << data3 << '\n';
+}
+
 int main()
 { 
-  TestConstructor();
-  TestAssignment();
-	TestInsert();
-	TestRemove();
+  // TestConstructor();
+  // TestAssignment();
+	// TestInsert();
+	// TestRemove();
+  // TestIterator();
 	
 	std::cout << "All tests completed successfully." << '\n';
 	
