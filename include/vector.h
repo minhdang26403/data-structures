@@ -166,6 +166,12 @@ class Vector {
     }
   }
 
+  /**
+   * Returns the number of elements that the can hold
+   * @return the capacity of the currently allocated vector
+   */
+  SizeType Capacity() const noexcept { return capacity_; }
+
   /** Modifiers */
 
   /**
