@@ -102,6 +102,17 @@ class Vector {
     return *this;
   }
 
+  /**
+   * Assigns the values of the initializer list to the current vector 
+   * @param init the initializer list
+   * @return a reference to the calling object
+   */
+  Vector& operator=(std::initializer_list<Type> init) {
+    Vector temp(init);
+    temp.Swap(*this);
+    return *this;
+  }
+
   /** Access methods */
 
   /**
@@ -223,7 +234,7 @@ class Vector {
    */
   template<typename... Args>
   void EmplaceBack(Args&&... args) {
-    Emplace(size_, args);
+    Emplace(size_, args...);
   }
 
   /**
