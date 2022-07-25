@@ -205,11 +205,26 @@ class Vector {
     Insert(size_, std::move(value));
   }
 
-  // template<typename... Args>
-  // Iterator Emplace(ConstIterator pos, Args&&... args);
+  /**
+   * Constructs and inserts an element into the position `index`
+   * @param index the position to insert
+   * @param args the arguments to construct the element
+   */
+  template<typename... Args>
+  void Emplace(SizeType index, Args&&... args) {
+    PrepareForInsertion(index);
+    array_[index] = std::move(Type(std::forward<Args>(args)...));
+    ++size_;
+  }
 
-  // template<typename... Args>
-  // Reference EmplaceBack(Args&&... args);
+  /**
+   * Constructs and inserts an element into the back of the vector
+   * @param args the arguments to construct the element
+   */
+  template<typename... Args>
+  void EmplaceBack(Args&&... args) {
+    Emplace(size_, args);
+  }
 
   /**
    * Removes the last element of the vector
