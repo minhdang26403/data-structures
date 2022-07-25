@@ -1,6 +1,7 @@
 #include "vector.h"
-#include <iostream>
+
 #include <cassert>
+#include <iostream>
 #include <string>
 
 template<typename Type>
