@@ -1,5 +1,5 @@
-#ifndef LINKED_LIST_H
-#define LINKED_LIST_H
+#ifndef LINKED_LIST_H_
+#define LINKED_LIST_H_
 
 namespace ds {
 
@@ -72,4 +72,4 @@ class LinkedList {
 
 } // namespace ds
 
-#endif 
+#endif  // LINKED_LIST_H_
