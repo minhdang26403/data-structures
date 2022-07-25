@@ -110,6 +110,8 @@ void TestIterator() {
     data3.PushBack(*it);
   }
   std::cout << data3 << '\n';
+
+  std::cout << *data1.cbegin() << '\n';
 }
 
 int main()

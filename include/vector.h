@@ -15,51 +15,9 @@ class Vector {
   using ValueType = Type;
   using Reference = ValueType&;
   using ConstReference = const ValueType&;
-  using Pointer = Type*;
+  using Iterator = Type*;
+  using ConstIterator = const Type*;
   using SizeType = std::size_t;
-  
-  /** Implement iterator for Vector class */
-  class Iterator {
-   public:
-    Iterator(Pointer ptr) : m_ptr_(ptr) {}
-
-    Pointer operator->() { return m_ptr_; }
-
-    Reference operator*() { return *m_ptr_; }
-
-    Iterator& operator++() {
-      ++m_ptr_;
-      return *this;
-    }
-
-    Iterator operator++(int) {
-      Iterator temp = *this;
-      ++(*this);
-      return temp;
-    }
-
-    Iterator& operator--() {
-      --m_ptr_;
-      return *this;
-    }
-
-    Iterator operator--(int) {
-      Iterator temp = *this;
-      --(*this);
-      return *this;
-    }
-
-    bool operator==(const Iterator& other) {
-      return m_ptr_ == other.m_ptr_;
-    }
-
-    bool operator!=(const Iterator& other) {
-      return !(*this == other);
-    }
-
-   private:
-    Pointer m_ptr_;
-  };
 
   /**
   * Default constructor
@@ -177,8 +135,10 @@ class Vector {
   }
 
   /** Iterators */
-  Iterator begin() noexcept { return Iterator(array_); }
-  Iterator end() noexcept { return Iterator(array_ + size_); }
+  Iterator begin() noexcept { return array_; }
+  ConstIterator cbegin() const noexcept { return array_; }
+  Iterator end() noexcept { return array_ + size_; }
+  ConstIterator cend() const noexcept { return array_ + size_; }
 
   /**
    * Checks whether the vector is empty
