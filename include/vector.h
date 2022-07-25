@@ -1,5 +1,5 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef VECTOR_H_
+#define VECTOR_H_
 
 #include <algorithm>
 #include <stdexcept>
@@ -15,10 +15,52 @@ class Vector {
   using ValueType = Type;
   using Reference = ValueType&;
   using ConstReference = const ValueType&;
-  using Iterator = Type*;
-  using ConstIterator = const Type*;
+  using Pointer = Type*;
   using SizeType = std::size_t;
   
+  /** Implement iterator for Vector class */
+  class Iterator {
+   public:
+    Iterator(Pointer ptr) : m_ptr_(ptr) {}
+
+    Pointer operator->() { return m_ptr_; }
+
+    Reference operator*() { return *m_ptr_; }
+
+    Iterator& operator++() {
+      ++m_ptr_;
+      return *this;
+    }
+
+    Iterator operator++(int) {
+      Iterator temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    Iterator& operator--() {
+      --m_ptr_;
+      return *this;
+    }
+
+    Iterator operator--(int) {
+      Iterator temp = *this;
+      --(*this);
+      return *this;
+    }
+
+    bool operator==(const Iterator& other) {
+      return m_ptr_ == other.m_ptr_;
+    }
+
+    bool operator!=(const Iterator& other) {
+      return !(*this == other);
+    }
+
+   private:
+    Pointer m_ptr_;
+  };
+
   /**
   * Default constructor
   */
@@ -134,17 +176,21 @@ class Vector {
     return array_[index];
   }
 
+  /** Iterators */
+  Iterator begin() noexcept { return Iterator(array_); }
+  Iterator end() noexcept { return Iterator(array_ + size_); }
+
   /**
    * Checks whether the vector is empty
    * @return true if the vector is empty; false otherwise
    */
-  bool IsEmpty() const noexcept { return size_ == 0; };
+  bool IsEmpty() const noexcept { return size_ == 0; }
 
   /**
    * Gets the size of the vector
    * @return the current size of the vector
    */
-  SizeType Size()  const noexcept { return size_; };
+  SizeType Size()  const noexcept { return size_; }
 
   /**
    * Increase the capacity of the vector
@@ -168,14 +214,14 @@ class Vector {
    * @param value the value of the element
    */
   void Insert(SizeType index, const Type& value) {
-    PrepareForInsertion();
+    PrepareForInsertion(index);
     array_[index] = value;
     ++size_;
   }
 
   /** Overload of insert method supporting move semantics */
   void Insert(SizeType index, Type&& value) {
-    PrepareForInsertion();
+    PrepareForInsertion(index);
     array_[index] = std::move(value);
     ++size_;
   }
@@ -193,11 +239,11 @@ class Vector {
     Insert(size_, std::move(value));
   }
 
-  template<typename... Args>
-  Iterator Emplace(ConstIterator pos, Args&&... args);
+  // template<typename... Args>
+  // Iterator Emplace(ConstIterator pos, Args&&... args);
 
-  template<typename... Args>
-  Reference EmplaceBack(Args&&... args);
+  // template<typename... Args>
+  // Reference EmplaceBack(Args&&... args);
 
   /**
    * Removes the last element of the vector
@@ -222,7 +268,7 @@ class Vector {
   /**
    * Checks for index boundary, reallocates the array (if needed), and shifts elements
    */
-  void PrepareForInsertion() {
+  void PrepareForInsertion(SizeType index) {
     if (index < 0 || index > size_) {
       throw std::out_of_range("Index out of range");
     }
@@ -277,4 +323,4 @@ class Vector {
 
 } // namespace ds
 
-#endif
+#endif  // VECTOR_H_
