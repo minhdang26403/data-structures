@@ -19,4 +19,4 @@ vector_test: $(TESTDIR)/vector_test.cpp
 linked_list_test: $(TESTDIR)/linked_list_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 clean:
-	rm -rf $(PROGRAMS) *.o *.a
+	rm -rf $(PROGRAMS) *.o *.a a.out *.err *~
