@@ -115,6 +115,16 @@ void TestIterator() {
   std::cout << *data1.cbegin() << '\n';
 }
 
+void TestEmplace() {
+  ds::Vector<std::pair<int, int>> data1;
+  std::pair<int, int> a {1, 2};
+  data1.PushBack(a);
+  data1.EmplaceBack(3, 4);
+  for (auto pair : data1) {
+    std::cout << pair.first << ", " << pair.second << '\n';
+  }
+}
+
 int main()
 { 
   // TestConstructor();
@@ -122,8 +132,16 @@ int main()
 	// TestInsert();
 	// TestRemove();
   // TestIterator();
+  // TestEmplace();
+  using std::cout;
 	
-	std::cout << "All tests completed successfully." << '\n';
+  ds::Vector<std::string> data1;
+  std::string s{"abc"};
+  data1.PushBack(s);
+  cout << data1 << '\n';
+  cout << s << '\n';
+
+	cout << "All tests completed successfully." << '\n';
 	
 	return 0;
 }
