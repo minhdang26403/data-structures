@@ -22,7 +22,7 @@ class Vector {
   /**
   * Default constructor
   */
-  Vector() = default;
+  Vector() : array_{new Type[INITIAL_CAPACITY]} {}
 
   /**
    * Construct a new Vector object of `count` elements with `value` values
@@ -191,16 +191,12 @@ class Vector {
    * @param value the value of the element
    */
   void Insert(SizeType index, const Type& value) {
-    PrepareForInsertion(index);
-    array_[index] = value;
-    ++size_;
+    Emplace(index, value);
   }
 
   /** Overload of insert method supporting move semantics */
   void Insert(SizeType index, Type&& value) {
-    PrepareForInsertion(index);
-    array_[index] = std::move(value);
-    ++size_;
+    Emplace(index, std::move(value));
   }
 
   /**
@@ -208,12 +204,12 @@ class Vector {
    * @param value the value of the element to add
    */
   void PushBack(const Type& value) {
-    Insert(size_, value);
+    Emplace(size_, value);
   }
 
   /** Overload of push back method supporting move semantics */
   void PushBack(Type&& value) {
-    Insert(size_, std::move(value));
+    Emplace(size_, std::move(value));
   }
 
   /**
@@ -234,7 +230,7 @@ class Vector {
    */
   template<typename... Args>
   void EmplaceBack(Args&&... args) {
-    Emplace(size_, args...);
+    Emplace(size_, std::forward<Args>(args)...);
   }
 
   /**
@@ -254,6 +250,22 @@ class Vector {
       array_[i] = array_[i + 1];
     }
     --size_;
+  }
+
+  /** Overloads equal operator 
+   * @param rhs the vector to compared with
+   * @return true if two vectors are equal; otherwise, false
+   */
+  bool operator==(const Vector& rhs) {
+    if (size_ != rhs.size_) {
+      return false;
+    }
+    for (uint32_t i = 0; i < size_; ++i) {
+      if (array_[i] != rhs.array_[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
  private:
