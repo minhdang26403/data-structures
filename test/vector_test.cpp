@@ -4,16 +4,7 @@
 #include <iostream>
 #include <string>
 
-template<typename Type>
-std::ostream& operator<<(std::ostream& s, const ds::Vector<Type>& v) {
-    s.put('[');
-    char comma[3] = {'\0', ' ', '\0'};
-    for (uint32_t i = 0; i < v.Size(); ++i) {
-        s << comma << v[i];
-        comma[0] = ',';
-    }
-    return s << ']';
-}
+#include "util.h"
 
 void TestConstructor() {
   ds::Vector<std::string> strs1 = {"abc", "def", "qwe"};
@@ -133,15 +124,8 @@ int main()
 	// TestRemove();
   // TestIterator();
   // TestEmplace();
-  using std::cout;
-	
-  ds::Vector<std::string> data1;
-  std::string s{"abc"};
-  data1.PushBack(s);
-  cout << data1 << '\n';
-  cout << s << '\n';
 
-	cout << "All tests completed successfully." << '\n';
+	std::cout << "All tests completed successfully." << '\n';
 	
 	return 0;
 }
