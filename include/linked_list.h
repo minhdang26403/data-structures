@@ -8,6 +8,8 @@
 
 namespace ds {
 
+class IndexError { };
+
 template<typename Type>
 struct Node {
   Type value_{};
@@ -15,8 +17,8 @@ struct Node {
   Node *prev_{};
 
   Node() = default;
-  Node(Type value) : value_(value), next_(nullptr), prev_(nullptr) {}
-  Node(Type value, Node *next) : value_(value), next_(next), prev_(nullptr) {}
+  Node(const Type& value, Node *next=nullptr, Node *prev=nullptr) : value_(value), next_(next), prev_(prev) {}
+  Node(Type&& value, Node *next=nullptr, Node *prev=nullptr) : value_(std::move(value)), next_(next), prev_(prev) {}
 };
 
 template<typename Type>
@@ -224,11 +226,26 @@ class LinkedList {
    * @param value the value of the element
    */
   void Insert(SizeType index, const Type& value) {
-    if (index < 0 || index > count) {
+    Emplace(index, value);
+  }
+
+  /** Overload method taking rvalue reference */
+  void Insert(SizeType index, Type&& value) {
+    Emplace(index, std::move(value));
+  }
+
+  /**
+   * Constructs and inserts an element into the position `index`
+   * @param index the position to insert
+   * @param args the arguments to construct the element
+   */
+  template<typename... Args>
+  void Emplace(SizeType index, Args&&... args) {
+    if (index < 0 || index > size_) {
       throw IndexError();
     }
     
-    auto new_node = Node<Type>(value);
+    auto new_node = new Node<Type>(std::move(Type(std::forward<Args>(args)...)));
     if (index == 0) {
       new_node->next_ = head_;
       if (head_ != nullptr) {
@@ -236,9 +253,10 @@ class LinkedList {
       }
       head_ = new_node;
     } else {
-      Node *prev_node = Find(index - 1);
+      Pointer prev_node = Find(index - 1);
       new_node->next_ = prev_node->next_;
       new_node->prev_ = prev_node;
+      prev_node->next_ = new_node;
     }
     if (index == size_) {
       tail_ = new_node;
@@ -246,6 +264,101 @@ class LinkedList {
       new_node->next_->prev_ = new_node;
     }
     ++size_;
+  }
+
+  /**
+   * Erases the element at `index` position from the linked list
+   * @param index the position to delete
+   */
+  void Erase(SizeType index) {
+    if (index < 0 || index >= size_) {
+      throw IndexError();
+    }
+
+    Pointer node_to_delete;
+    if (index == 0) {
+      node_to_delete = head_;
+      head_ = head_->next_;
+      if (head_ == nullptr) {
+        tail_ = nullptr;
+      } 
+    } else {
+        Pointer prev_node = Find(index - 1);
+        node_to_delete = prev_node->next_;
+        prev_node->next_ = prev_node->next_->next_;
+        if (index == size_ - 1) {
+          tail_ = prev_node;
+        } else {
+          prev_node->next_->prev_ = prev_node;
+        }
+    }
+    delete node_to_delete;
+    --size_;
+  }
+
+  /** Appends the given element value to the end of the linked list 
+   * @param value the value of the element to append
+   */
+  void PushBack(const Type& value) {
+    Emplace(size_, value);
+  }
+
+  void PushBack(Type&& value) {
+    Emplace(size_, std::move(value));
+  }
+
+  /** Prepends the given element value to the beginning of the linked list 
+   * @param value the value of the element to prepend
+   */
+  void PushFront(const Type& value) {
+    Emplace(0, value);
+  }
+
+  void PushFront(Type&& value) {
+    Emplace(0, std::move(value));
+  }
+
+  /**
+   * Constructs and pushes an element to the end of the linked list
+   * @param args the arguments to constructs the element
+   * @return the value of the element
+   */
+  template<typename... Args>
+  Reference EmplaceBack(Args&&... args) {
+    Emplace(size_, std::forward<Args>(args)...);
+    return Back();
+  }
+
+  /**
+   * Constructs and pushes an element to the beginning of the linked list
+   * @param args the arguments to constructs the element
+   * @return the value of the element
+   */
+  template<typename... Args>
+  Reference EmplaceFront(Args&&... args) {
+    Emplace(0, std::forward<Args>(args)...);
+    return Front();
+  }
+
+  /** Removes the last element of the linked list */
+  void PopBack() {
+    Erase(size_ - 1);
+  }
+
+  /** Removes the first element of the linked list */
+  void PopFront() {
+    Erase(0);
+  }
+
+  void Reverse() noexcept {
+    Pointer cur = head_;
+    while (cur != nullptr) {
+      Pointer temp = cur->next_;
+      cur->next_ = cur->prev_;
+      cur->prev_ = temp;
+      cur = temp;
+    }
+    std::swap(head_, tail_);
   }
 
  private:
@@ -311,8 +424,6 @@ class LinkedList {
   Node<Type> *tail_{};
   SizeType size_{};
 };
-
-class IndexError { };
 
 } // namespace ds
 
