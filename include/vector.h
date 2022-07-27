@@ -2,7 +2,6 @@
 #define VECTOR_H_
 
 #include <algorithm>
-#include <cstdlib>
 #include <stdexcept>
 
 #include "./config.h"
@@ -143,6 +142,22 @@ class Vector {
   /** Index operator for const Vector object */
   ConstReference operator[](SizeType index) const {
     return array_[index];
+  }
+
+  /** @return a reference to the first element */
+  Reference Front() {
+    return array_[0];
+  }
+  ConstReference Front() const {
+    return array_[0];
+  }
+
+  /** @return a reference to the last element */
+  Reference Back() {
+    return array_[size_ - 1];
+  }
+  ConstReference Back() const {
+    return array_[size_ - 1];
   }
 
   /** Iterators */
