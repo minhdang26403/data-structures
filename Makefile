@@ -11,7 +11,9 @@ INCLUDEDIR = -I./include -I.
 PROGRAMS = vector_test \
 	linked_list_test \
 	sorting_test \
-	stack_test
+	stack_test \
+	queue_test \
+	hash_table_test
 
 all: $(PROGRAMS)
 
@@ -25,6 +27,9 @@ stack_test: $(TESTDIR)/stack_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 queue_test: $(TESTDIR)/queue_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+hash_table_test: $(TESTDIR)/hash_table_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 sorting_test: $(TESTDIR)/sorting_test.cpp
