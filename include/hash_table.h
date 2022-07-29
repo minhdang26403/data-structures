@@ -39,10 +39,12 @@ class HashTable {
    */
   HashTable(SizeType capacity, float load_factor) : capacity_(capacity), max_load_factor_(load_factor), table_(new LinkedList<EntryType>[capacity_]) {}
 
+  /** Destructor */
   ~HashTable() {
     delete [] table_;
   }
 
+  /** Disallow copy constructor and copy assignment operator */
   HashTable(const HashTable& other) = delete;
   HashTable& operator=(const HashTable& other) = delete;
   
@@ -52,6 +54,11 @@ class HashTable {
   /** @return true if the hash table is empty; otherwise, false */
   bool IsEmpty() const { return Size() == 0; }
 
+  /** Insert a key-value pair into the hash table.
+   * If the key is already exists, modify the value of that key
+   * @param key the key to insert
+   * @param value the value of the key 
+   */
   void Insert(const KeyType& key, const ValueType& value) {
     uint32_t index = KeyToIndex(key);
     for (auto& entry : table_[index]) {
@@ -67,6 +74,10 @@ class HashTable {
     ++size_;
   }
 
+  /**
+   * Deletes a key from the hash table
+   * @param key the key to delete
+   */
   void Delete(const KeyType& key) {
     uint32_t index = KeyToIndex(key);
     for (auto &entry : table_[index]) {
@@ -78,16 +89,26 @@ class HashTable {
     }
   }
 
+  /**
+   * Gets the value of the key
+   * Throws exception if the key doesn't exist
+   * @param key the key to get its value from
+   * @return a reference to the value of that key
+   */
   ValueType& Get(const KeyType& key) {
     uint32_t index = KeyToIndex(key);
-    for (const auto& entry : table_[index]) {
+    for (auto& entry : table_[index]) {
       if (entry.key_ == key) {
         return entry.value_;
       }
     }
-    return ValueType();
+    throw std::out_of_range("The key doesn't exist");
   }
 
+  /** Checks if the hash table contains the `key` key
+   * @param key the key to check
+   * @return true if the key exists; otherwise, false
+   */
   bool Contains(const KeyType& key) {
     uint32_t index = KeyToIndex(key);
     for (const auto& entry : table_[index]) {
@@ -98,6 +119,10 @@ class HashTable {
     return false;
   }
 
+  /**
+   * Converts the content of hash table to string
+   * @return the hash table as string (i.e. [{key1, val1}, {key2, val2},...])
+   */
   std::string ToString() {
     if (Size() == 0) {
       return "[]";
@@ -115,6 +140,9 @@ class HashTable {
   }
 
  private:
+  /**
+   * Grows the hash table 
+   */
   void GrowTable() {
     auto new_table = new LinkedList<EntryType>[capacity_*2];
     for (SizeType idx = 0; idx < capacity_; ++idx) {
@@ -127,9 +155,16 @@ class HashTable {
     delete []table_;
     table_ = new_table;
   }
+
+  /**
+   * Converts the key into index to the bucket
+   * @param key the key to convert
+   * @return the index (bucket number)
+   */
   uint32_t KeyToIndex(KeyType key) {
     return std::hash<KeyType>()(key) % capacity_;
   }
+  
   // The ratio between the number of elements and the number of bucket slots
   static constexpr float DEFAULT_LOAD_FACTOR = 0.75;
   static constexpr uint32_t DEFAULT_CAPACITY = 8;
