@@ -3,6 +3,6 @@
 
 #include <cstdlib>
 
-static constexpr std::size_t INITIAL_CAPACITY =  10;
+static constexpr std::size_t INITIAL_CAPACITY =  16;
 
 #endif
