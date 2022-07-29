@@ -296,6 +296,34 @@ class LinkedList {
     --size_;
   }
 
+  /**
+   * Erases the element with `value` value
+   * @param value the value of the element to erase
+   */
+  void Erase(const Type& value) {
+    Pointer prev = nullptr;
+    Pointer node_to_delete = head_;
+    while (node_to_delete != nullptr && node_to_delete->value_ != value) {
+      prev = node_to_delete;
+      node_to_delete = node_to_delete->next_;
+    }
+    if (prev == nullptr) {
+      head_ = head_->next_;
+      if (head_ == nullptr) {
+        tail_ = nullptr;
+      }
+    } else {
+      prev->next_ = node_to_delete->next_;
+      if (prev->next_ != nullptr) {
+        prev->next_->prev_ = prev;
+      } else {
+        tail_ = prev;
+      }
+    }
+    delete node_to_delete;
+    --size_;
+  }
+
   /** Appends the given element value to the end of the linked list 
    * @param value the value of the element to append
    */

@@ -96,6 +96,25 @@ void TestRemove()
 	assert(list.ToString() == "[ghi]");
 }
 
+void TestErase()
+{
+	ds::LinkedList<std::string> list;
+	list.Insert(0, "abc");
+	list.Insert(1, "def");
+	list.Insert(1, "ghi");
+	list.Insert(0, "xyz");
+	list.Erase("xyz");
+	assert(list.Front() == "abc");
+
+	list.Erase("abc");
+	assert(list.Front() == "ghi");
+
+	list.Erase("def");
+	assert(list.ToString() == "[ghi]");
+  list.Erase("ghi");
+  assert(list.Size() == 0);
+}
+
 void TestReverse()
 {
 	ds::LinkedList<std::string> list;
@@ -123,6 +142,8 @@ int main() {
   // TestEmplace();
   // TestRemove();
   // TestReverse();
+  TestErase();
+
   std::cout << "All tests completed successfully." << '\n';
 
   return 0;
