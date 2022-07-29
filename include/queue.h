@@ -6,12 +6,12 @@
 namespace ds {
 template<typename Type>
 class Queue {
-public:
+ public:
   using ValueType = Type;
   using SizeType = std::size_t;
   using Reference = ValueType&;
   using ConstReference = const ValueType&;
-public:
+ public:
   Queue() = default;
   Queue(const Queue& other) = default;
   Queue(Queue&& other) noexcept = default;
@@ -65,7 +65,7 @@ public:
     queue_.PopFront();
   }
 
-private:
+ private:
   void CheckQueue() {
     if (IsEmpty()) {
       throw std::out_of_range("The queue is empty.");

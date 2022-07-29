@@ -8,12 +8,12 @@
 namespace ds {
 template<typename Type>
 class Stack {
-public:
+ public:
   using ValueType = Type;
   using SizeType = std::size_t;
   using Reference = ValueType&;
   using ConstReference = const ValueType&;
-public:
+ public:
   Stack() = default;
   Stack(const Stack& other) = default;
   Stack(Stack&& other) noexcept = default;
@@ -72,7 +72,7 @@ public:
   bool operator==(const Stack& rhs) {
     return data_ == rhs.data_;
   }
-private:
+ private:
   void CheckStack() {
     if (IsEmpty()) {
       throw std::out_of_range("The stack is empty.");
