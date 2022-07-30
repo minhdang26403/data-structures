@@ -39,14 +39,55 @@ class HashTable {
    */
   HashTable(SizeType capacity, float load_factor) : capacity_(capacity), max_load_factor_(load_factor), table_(new LinkedList<EntryType>[capacity_]) {}
 
+  /** 
+   * Copy constructor 
+   * @param other the source object to copy from
+   */
+  HashTable(const HashTable& other) {
+    table_ = new LinkedList<EntryType>[other.capacity_];
+    size_ = other.size_;
+    capacity_ = other.capacity_;
+    max_load_factor_ = other.max_load_factor_;
+    for (SizeType idx = 0; idx < size_; ++idx) {
+      for (const auto& entry : other.table_[idx]) {
+        table[idx].PushBack(entry);
+      }
+    }
+  }
+
+  /**
+   * Move constructor
+   * @param other the source object to move from
+   */
+  HashTable(HashTable&& other) {
+    other.Swap(*this);
+  }
+
   /** Destructor */
   ~HashTable() {
     delete [] table_;
   }
 
-  /** Disallow copy constructor and copy assignment operator */
-  HashTable(const HashTable& other) = delete;
-  HashTable& operator=(const HashTable& other) = delete;
+  /** 
+   * Copy assignment 
+   * @param other the source object to assign from
+   * @return a reference to the assigned hash table
+   */
+  HashTable& operator=(const HashTable& other) {
+    HashTable copy(other);
+    copy.Swap(*this);
+    return *this;
+  }
+
+  /**
+   * Move assignment
+   * @param other the source object to move from
+   * @return a reference to the assigned hash table
+   */
+  HashTable& operator=(HashTable&& other) noexcept {
+    other.Swap(*this);
+    return *this;
+  }
   
   /** @return the number of elements in the hash table */
   SizeType Size() const { return size_; }
@@ -154,6 +195,14 @@ class HashTable {
     capacity_ *= 2;
     delete []table_;
     table_ = new_table;
+  }
+
+  void Swap(HashTable& rhs) {
+    using std::swap;
+    swap(capacity_, rhs.capacity_);
+    swap(max_load_factor_, rhs.max_load_factor_);
+    swap(size_, rhs.size_);
+    swap(table_, rhs.table_);
   }
 
   /**
