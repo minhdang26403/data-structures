@@ -16,6 +16,7 @@ struct Node {
 template<typename Type>
 class BST {
  public:
+  using Pointer = Node<Type>*;
   BST() = default;
   ~BST() {
     DestructTree(root_);
@@ -25,12 +26,19 @@ class BST {
   BST& operator=(const BST& other) = delete;
 
   /**
+   * @return a pointer to the root of the tree
+   */
+  Pointer GetRoot() {
+    return root_;
+  }
+
+  /**
    * Searchs the BST for a value
    * @param value the value to search
    * @return the pointer to the tree node containing the value
    */
-  Node* Search(const Type& value) {
-    Node* node = root_;
+  Pointer Search(const Type& value) {
+    Pointer node = root_;
     while (node != nullptr && node->value_ != value) {
       if (value < node->value_) {
         node = node->left_;
@@ -46,7 +54,7 @@ class BST {
    * @param node the root of that subtree
    * @return the pointer to the tree node containing the minimum value
    */
-  Node *Minimum(Node *node) {
+  Pointer Minimum(Pointer node) {
     while (node != nullptr && node->left_ != nullptr) {
       node = node->left_;
     }
@@ -58,7 +66,7 @@ class BST {
    * @param node the root of that subtree
    * @return the pointer to the tree node containing the maximum value
    */
-  Node *Maximum(Node *node) {
+  Pointer Maximum(Pointer node) {
     while (node != nullptr && node->right_ != nullptr) {
       node = node->right_;
     }
@@ -70,9 +78,9 @@ class BST {
    * @param node the node to find its successor
    * @return a pointer to the successor node
    */
-  Node* Successor(Node* node) {
+  Pointer Successor(Pointer node) {
     if (node->right_ != nullptr) {
-      return Minimum(x->right_);
+      return Minimum(node->right_);
     }
     while (node->parent_ != nullptr && node != node->parent_->right_) {
       node = node->parent_;
@@ -85,9 +93,9 @@ class BST {
    * @param node the node to find its predecessor
    * @return a pointer to the predecessor node
    */
-  Node* Predecessor(Node* node) {
+  Pointer Predecessor(Pointer node) {
     if (node->left_ != nullptr) {
-      return Maximum(x->left_);
+      return Maximum(node->left_);
     }
     while (node->parent_ != nullptr && node != node->parent_->left_) {
       node = node->parent_;
@@ -100,9 +108,9 @@ class BST {
    * @param value the value of the element to insert
    */
   void Insert(const Type& value) {
-    auto new_node = new Node(value);
-    Node* parent = nullptr;
-    Node* cur = root_;
+    auto new_node = new Node<Type>(value);
+    Pointer parent = nullptr;
+    Pointer cur = root_;
     while (cur != nullptr) {
       parent = cur;
       if (value < cur->value_) {
@@ -127,7 +135,7 @@ class BST {
    * @return true if deletion succeeds; otherwise, false
    */
   bool Delete(const Type& value) {
-    Node *node = Search(value);
+    Pointer node = Search(value);
     if (node == nullptr) {
       return false;
     }
@@ -136,7 +144,7 @@ class BST {
     } else if (node->right_ == nullptr) {
       Transplant(node, node->left_);
     } else {
-      Node *successor = Minimum(node->right_);
+      Pointer successor = Minimum(node->right_);
       if (successor->parent_ != node) {
         Transplant(successor, successor->right_);
         successor->right_ = node->right_;
@@ -156,7 +164,7 @@ class BST {
    * @param u subtree to be replaced
    * @param v subtree to replace
    */
-  void Transplant(Node* u, Node* v) {
+  void Transplant(Pointer u, Pointer v) {
     if (u->parent_ == nullptr) {
       root_ = v;
     } else if (u->parent_->left_ == u) {
@@ -173,7 +181,7 @@ class BST {
    * Recursively destroy the BST
    * @param root the root of the tree
    */
-  void DestructTree(Node* root) {
+  void DestructTree(Pointer root) {
     if (root == nullptr) {
       return;
     }
@@ -182,7 +190,7 @@ class BST {
     delete root;
   }
   // The root of the tree
-  Node* root_{};
+  Pointer root_{};
 };
 
 } // namespace ds
