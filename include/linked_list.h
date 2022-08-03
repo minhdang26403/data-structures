@@ -448,6 +448,7 @@ class LinkedList {
     size_ = src.size_;
   }
 
+  // Always initialize pointers by default if the constructor doesn't specify
   Node<Type> *head_{};
   Node<Type> *tail_{};
   SizeType size_{};
