@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <utility>
 
 #include "vector.h"
@@ -12,39 +13,53 @@ namespace ds {
 template<typename Type, typename Comparator = std::less<Type>>
 class Heap {
  public:
-  using SizeType = std::size_t;
+  using SizeType = typename Vector<Type>::SizeType;
   using Reference = typename Vector<Type>::Reference;
   using ConstReference = typename Vector<Type>::ConstReference;
  public:
  /** Default constructor */
   Heap() = default;
+
   /**
    * Constructs a heap with elements from Vector `data`
    * @param data the list of elements to build the heap
    */
   explicit Heap(const Vector<Type>& data) : Heap(data, Comparator()) {}
 
+  /** Constructs a heap by moving elements from `data` to heap with default comparator */
+  explicit Heap(Vector<Type>&& data) noexcept : Heap(std::move(data), Comparator()) {}
+
   /**
    * Constructs a heap with elements from Vector `data`
    * @param data the list of elements to build the heap
    * @param cmp the comparison function object specifying heap property
    */
-  Heap(const Vector<Type>& data, Comparator cmp) : heap_(data), cmp_(cmp) {
+  Heap(const Vector<Type>& data, const Comparator& cmp) : heap_(data), cmp_(cmp) {
     BuildHeap();
   }
 
   /** Constructs a heap by moving elements from `data` to heap */
-  Heap(Vector<Type>&& data, Comparator cmp) : heap_(std::move(data)), cmp_(cmp) {
+  Heap(Vector<Type>&& data, const Comparator& cmp) : heap_(std::move(data)), cmp_(cmp) {
     BuildHeap();
   }
+
+  // Default all special member functions since this class doesn't handle any resource
+  /** Copy constructor */
   Heap(const Heap& other) = default;
+
+  /** Move constructor */
   Heap(Heap&& other) noexcept = default;
+
+  /** Copy assignment operator */
   Heap& operator=(const Heap& other) = default;
+
+  /** Move assignment operator */
   Heap& operator=(Heap&& other) = default;
 
+  /** Destructor */
   ~Heap() = default;
 
-  /** @return the top element of the heap */
+  /** @return the top element of the heap. Get garbage values if trying to access an empty heap */
   ConstReference Top() const { return heap_.Front(); }
 
   /** @return true if the heap is empty; false otherwise */
@@ -62,6 +77,10 @@ class Heap {
     SiftUp(Size() - 1);
   }
 
+  /**
+   * Pushes the given element to the heap
+   * @param value an rvalue reference to the element
+   */
   void Push(Type&& value) {
     heap_.PushBack(std::move(value));
     SiftUp(Size() - 1);
@@ -81,12 +100,29 @@ class Heap {
    * @return the value of the element
    */
   Type Pop() {
+    if (IsEmpty()) {
+      throw std::out_of_range("The heap is empty\n");
+    }
     Type val = heap_[0];
     std::swap(heap_[0], heap_[Size() - 1]);
     heap_.PopBack();
     // Fix the heap invariant from the root
     Heapify(0);
     return val;
+  }
+
+  /** For debugging */
+  void Print() {
+    int size = Size();
+    if (size == 0) {
+      std::cout << "Empty heap\n";
+    } else {
+      std::cout << "Heap: ";
+      for (int i = 0; i < size - 1; ++i) {
+        std::cout << heap_[i] << ", ";
+      }
+      std::cout << heap_[size - 1] << '\n';
+    }
   }
 
  private:
