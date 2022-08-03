@@ -13,9 +13,26 @@ template<typename KeyType, typename ValueType>
 struct Entry {
   KeyType key_;
   ValueType value_;
+  /** Default construct */
   Entry() = default;
+
+  /**
+   * Constructs a new Entry object
+   * @param key the key of the entry
+   * @param value the value of the entry
+   */
   Entry(KeyType key, ValueType value) : key_(key), value_(value) {}
+
+  /**
+   * @param rhs the Entry to compare with
+   * @return true if two entries have the same key; otherwise, false
+   */
   bool operator==(const Entry& rhs) const { return key_ == rhs.key_; }
+
+  /**
+   * @param rhs the Entry to compare with
+   * @return true if two entries have different keys; otherwise, false
+   */
   bool operator!=(const Entry& rhs) const { return !(*this == rhs); }
 };
 
@@ -38,7 +55,8 @@ class HashTable {
    * @param capacity the number of buckets of the hash table
    * @param load_factor the average number of elements per bucket (used for growing/shrinking table)
    */
-  HashTable(SizeType capacity, float load_factor) : capacity_(capacity), max_load_factor_(load_factor), table_(new LinkedList<EntryType>[capacity_]) {}
+  HashTable(SizeType capacity, float load_factor) 
+    : capacity_(capacity), max_load_factor_(load_factor), table_(new LinkedList<EntryType>[capacity_]) {}
 
   /** 
    * Copy constructor 
@@ -49,9 +67,9 @@ class HashTable {
     size_ = other.size_;
     capacity_ = other.capacity_;
     max_load_factor_ = other.max_load_factor_;
-    for (SizeType idx = 0; idx < size_; ++idx) {
+    for (SizeType idx = 0; idx < capacity_; ++idx) {
       for (const auto& entry : other.table_[idx]) {
-        table[idx].PushBack(entry);
+        table_[idx].PushBack(entry);
       }
     }
   }
@@ -144,7 +162,7 @@ class HashTable {
         return entry.value_;
       }
     }
-    throw std::out_of_range("The key doesn't exist");
+    throw std::out_of_range("The key doesn't exist\n");
   }
 
   /** Checks if the hash table contains the `key` key
@@ -198,6 +216,11 @@ class HashTable {
     table_ = new_table;
   }
 
+
+  /**
+   * Swaps the content of two hash tables
+   * @param rhs the other hash table to swap with
+   */
   void Swap(HashTable& rhs) {
     using std::swap;
     swap(capacity_, rhs.capacity_);
@@ -218,10 +241,10 @@ class HashTable {
   // The ratio between the number of elements and the number of bucket slots
   static constexpr float DEFAULT_LOAD_FACTOR = 0.75;
   static constexpr uint32_t DEFAULT_CAPACITY = 8;
-  SizeType capacity_;
-  float max_load_factor_;
+  SizeType capacity_{DEFAULT_CAPACITY};
+  float max_load_factor_{DEFAULT_LOAD_FACTOR};
   SizeType size_{0};
-  LinkedList<EntryType>* table_;
+  LinkedList<EntryType>* table_{};
 };
 
 } // namespace ds
