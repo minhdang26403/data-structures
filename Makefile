@@ -13,7 +13,9 @@ PROGRAMS = vector_test \
 	sorting_test \
 	stack_test \
 	queue_test \
-	hash_table_test
+	hash_table_test \
+	bst_test \
+	heap_test
 
 all: $(PROGRAMS)
 
@@ -30,6 +32,12 @@ queue_test: $(TESTDIR)/queue_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 hash_table_test: $(TESTDIR)/hash_table_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+bst_test: $(TESTDIR)/bst_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+heap_test: $(TESTDIR)/heap_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 sorting_test: $(TESTDIR)/sorting_test.cpp
