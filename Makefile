@@ -10,12 +10,13 @@ INCLUDEDIR = -I./include -I.
 
 PROGRAMS = vector_test \
 	linked_list_test \
-	sorting_test \
 	stack_test \
 	queue_test \
 	hash_table_test \
 	bst_test \
-	heap_test
+	heap_test \
+	avl_test \
+	sorting_test \
 
 all: $(PROGRAMS)
 
@@ -38,6 +39,9 @@ bst_test: $(TESTDIR)/bst_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 heap_test: $(TESTDIR)/heap_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+avl_test: $(TESTDIR)/avl_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 sorting_test: $(TESTDIR)/sorting_test.cpp
