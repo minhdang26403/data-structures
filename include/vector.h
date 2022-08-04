@@ -68,8 +68,8 @@ class Vector {
     : array_{new Type[init.size()]}, capacity_{init.size()}, size_{init.size()}
   { 
     int i = 0;
-    for (auto it = init.begin(); it != init.end(); ++it) {
-      array_[i++] = *it;
+    for (const auto& ele : init) {
+      array_[i++] = ele;
     }
   }
 
