@@ -1,6 +1,12 @@
 #ifndef BST_H_
 #define BST_H_
 
+#include <algorithm>
+#include <iostream>
+#include <string>
+
+#include "vector.h"
+
 namespace ds {
 template<typename Type>
 struct Node {
@@ -17,13 +23,46 @@ template<typename Type>
 class BST {
  public:
   using Pointer = Node<Type>*;
+  /** Default constructor */
   BST() = default;
+
+  /** Copy constructor 
+   * @param other the source BST to construct from
+   */
+  BST(const BST& other) {
+    root_ = BuildTree(other.root_);
+  }
+
+  /** Move constructor 
+   * @param other the source BST to move from
+   */
+  BST(BST&& other) {
+    other.Swap(*this);
+  }
+
+  /** Destructor */
   ~BST() {
     DestructTree(root_);
   }
 
-  BST(const BST& other) = delete;
-  BST& operator=(const BST& other) = delete;
+  /** Copy assignment operator 
+   * @param other the source BST to assign from
+   * @return a reference to the BST assigned
+   */
+  BST& operator=(const BST& other) {
+    BST copy(other);
+    copy.Swap(*this);
+    return *this;
+  }
+
+  /** Move assignment operator 
+   * @param the source BST to move from
+   * @return a reference to the BST assigned
+   */
+  BST& operator=(BST&& other) noexcept {
+    other.Swap(*this);
+    return *this;
+  }
 
   /**
    * @return a pointer to the root of the tree
@@ -158,7 +197,42 @@ class BST {
     return true;
   }
 
+  /** Get all the values of elements in the BST in order 
+   * @return a vector of values of elements in the BST
+   */
+  Vector<Type> GetValues() {
+    Vector<Type> data;
+    InorderTraversal(root_, data);
+    return data;
+  }
+
+  /** For debugging */
+  void Print() {
+    ds::Vector<Type> tree_vals = GetValues();
+    if (tree_vals.IsEmpty()) {
+      std::cout << "<Empty tree>\n";
+    } else {
+      for (const auto& num : tree_vals) {
+        std::cout << num << ' ';
+      }
+      std::cout << '\n';
+    }
+  }
+
  private:
+  /**
+   * Inorder traverses the BST
+   * @param root_ the root of the subtree
+   * @param data the list of values we've gone through
+   */
+  void InorderTraversal(Pointer root_, Vector<Type>& data) {
+    if (root_ != nullptr) {
+      InorderTraversal(root_->left_, data);
+      data.PushBack(root_->value_);
+      InorderTraversal(root_->right_, data);
+    }
+  }
+
   /**
    * A helper function that replaces one subtree with another subtree
    * @param u subtree to be replaced
@@ -178,6 +252,21 @@ class BST {
   }
 
   /**
+   * Recursively builds a new BST
+   * @param root the root of the current subtree
+   * @return a pointer to the root of that subtree
+   */
+  Pointer BuildTree(Pointer root) {
+    if (root != nullptr) {
+      Pointer node = new Node<Type>(root->value_);
+      node->left_ = BuildTree(root->left_);
+      node->right_ = BuildTree(root->right_);
+      return node;
+    }
+    return nullptr;
+  }
+
+  /**
    * Recursively destroy the BST
    * @param root the root of the tree
    */
@@ -189,6 +278,12 @@ class BST {
     DestructTree(root->right_);
     delete root;
   }
+
+  void Swap(BST& rhs) {
+    using std::swap;
+    swap(root_, rhs.root_);
+  }
+
   // The root of the tree
   Pointer root_{};
 };
