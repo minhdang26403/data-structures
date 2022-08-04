@@ -118,12 +118,12 @@ void TestEmplace() {
 
 int main()
 { 
-  // TestConstructor();
-  // TestAssignment();
-	// TestInsert();
-	// TestRemove();
-  // TestIterator();
-  // TestEmplace();
+  TestConstructor();
+  TestAssignment();
+	TestInsert();
+	TestRemove();
+  TestIterator();
+  TestEmplace();
 
 	std::cout << "All tests completed successfully." << '\n';
 	
