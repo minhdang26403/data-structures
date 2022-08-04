@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 
-int main() {
+void Test1() {
   ds::Stack<int> data;
   data.Push(2);
   data.Push(6);
@@ -13,6 +13,10 @@ int main() {
   data.Pop();
   assert(data.Size() == 2);
   assert(data.Top() == 6);
+}
+
+int main() {
+  Test1();
 
   std::cout << "All test cases passed\n";
 

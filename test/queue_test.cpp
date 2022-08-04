@@ -3,7 +3,8 @@
 #include <cassert>
 #include <iostream>
 
-int main() {
+void Test1() {
+  std::cout << "-------Test 1-------\n";
   ds::Queue<int> q;
   q.Enqueue(1);
   q.Enqueue(2);
@@ -14,6 +15,10 @@ int main() {
 
   q.Dequeue();
   assert(q.Front() == 2);
+}
+
+int main() {
+  Test1();
 
   std::cout << "All test cases passed\n";
 
