@@ -14,6 +14,7 @@ struct Node {
   Node* parent_;
   Node* left_;
   Node* right_;
+  int height_;
 
   Node(const Type& value, Node* parent=nullptr, Node* left=nullptr, Node *right=nullptr)
     : value_(value), parent_(parent), left_(left), right_(right) {}
@@ -161,8 +162,9 @@ class BST {
   /**
    * Inserts a new element into the binary search tree
    * @param value the value of the element to insert
+   * @return a pointer to the newly inserted node
    */
-  void Insert(const Type& value) {
+  Pointer Insert(const Type& value) {
     auto new_node = new Node<Type>(value);
     Pointer parent = nullptr;
     Pointer cur = root_;
@@ -182,6 +184,7 @@ class BST {
     } else {
       parent->right_ = new_node;
     }
+    return new_node;
   }
 
   /**
@@ -189,7 +192,7 @@ class BST {
    * @param value the value to delete
    * @return true if deletion succeeds; otherwise, false
    */
-  bool Delete(const Type& value) {
+  virtual bool Delete(const Type& value) {
     Pointer node = Search(value);
     if (node == nullptr) {
       return false;
@@ -235,7 +238,7 @@ class BST {
     }
   }
 
- private:
+ protected:
   /**
    * Inorder traverses the BST
    * @param root_ the root of the subtree
