@@ -26,6 +26,22 @@ class BST {
   /** Default constructor */
   BST() = default;
 
+  /**
+   * Construct a new BST from a list of elements
+   * @param other the list of elements
+   */
+  BST(Vector<Type>& other) {
+    for (const auto& ele : other) {
+      Insert(ele);
+    }
+  }
+
+  BST(std::initializer_list<Type> data) {
+    for (const auto& ele : data) {
+      Insert(ele);
+    }
+  }
+
   /** Copy constructor 
    * @param other the source BST to construct from
    */
