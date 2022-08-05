@@ -3,39 +3,93 @@
 
 #include "bst.h"
 
+#include <algorithm>
+
 namespace ds {
 template<typename Type>
 class AVL : public BST<Type> {
  public:
-  using typename BST<Type>::Pointer;
   // using BST<Type>::root_;
+  using typename BST<Type>::Node;
+
   /** Default constructor */
   AVL() : BST<Type>() {}
-  /** Destructor */
-  ~AVL() = default;
 
   /**
-   * Inserts a new element into the binary search tree
-   * @param value the value of the element to insert
-   * @return a pointer to the newly inserted node
+   * Construct a new AVL tree from a list of elements
+   * @param other the list of elements
    */
-  void Insert(const Type& value) {
-    auto node = BST<Type>::Insert(value);
-    Rebalance(node);
+  AVL(Vector<Type>& other) {
+    for (const auto& ele : other) {
+      Insert(ele);
+    }
   }
 
   /**
-   * Deletes a value from the BST
+   * Construct a new AVL tree using an initializer list
+   * @param data the list of elements to initialize
+   */
+  AVL(std::initializer_list<Type> data) {
+    for (const auto& ele : data) {
+      Insert(ele);
+    }
+  }
+
+  /** Copy constructor 
+   * @param other the source AVL tree to construct from
+   */
+  AVL(const AVL& other) : BST<Type>(other) {}
+
+  /** Move constructor 
+   * @param other the source AVL tree to move from
+   */
+  AVL(AVL&& other) : BST<Type>(std::move(other)) {}
+
+  /** Destructor */
+  ~AVL() = default;
+
+  /** Copy assignment operator 
+   * @param other the source AVL tree to assign from
+   * @return a reference to the AVL tree assigned
+   */
+  AVL& operator=(const AVL& other) {
+    AVL copy(other);
+    copy.Swap(*this);
+    return *this;
+  }
+
+  /** Move assignment operator 
+   * @param the source AVL tree to move from
+   * @return a reference to the AVL tree assigned
+   */
+  AVL& operator=(AVL&& other) noexcept {
+    other.Swap(*this);
+    return *this;
+  }
+
+  /**
+   * Inserts a new element into the AVL tree
+   * @param value the value of the element to insert
+   * @return a pointer to the newly inserted node
+   */
+  Node* Insert(const Type& value) {
+    auto node = BST<Type>::Insert(value);
+    Rebalance(node);
+    return node;
+  }
+
+  /**
+   * Deletes a value from the AVL tree
    * @param value the value to delete
    * @return true if deletion succeeds; otherwise, false
    */
-  bool Delete(const Type& value) override {
-    Pointer node = BST<Type>::Search(value);
+  bool Delete(const Type& value) {
+    Node* node = BST<Type>::Search(value);
     if (node == nullptr) {
       return false;
     }
     // the parent of the physically deleted node, used for rebalacing
-    Pointer action_node;
+    Node* action_node;
     if (node->left_ == nullptr) {
       action_node = node->parent_;
       BST<Type>::Transplant(node, node->right_);
@@ -43,7 +97,7 @@ class AVL : public BST<Type> {
       action_node = node->parent_;
       BST<Type>::Transplant(node, node->left_);
     } else {
-      Pointer successor = BST<Type>::Minimum(node->right_);
+      Node* successor = BST<Type>::Minimum(node->right_);
       action_node = successor->parent_;
       if (successor->parent_ != node) {
         BST<Type>::Transplant(successor, successor->right_);
@@ -64,7 +118,7 @@ class AVL : public BST<Type> {
   * @param node the node to get height
   * @return the height of the node
   */
-  int Height(Pointer node) {
+  int Height(Node* node) {
     if (node == nullptr) {
       return -1;
     }
@@ -75,7 +129,7 @@ class AVL : public BST<Type> {
    * Calculates the height of a node
    * @param node the node to calculate the height
    */
-  void UpdateHeight(Pointer node) {
+  void UpdateHeight(Node* node) {
     node->height_ = std::max(Height(node->left_), Height(node->right_)) + 1;
   }
 
@@ -83,8 +137,8 @@ class AVL : public BST<Type> {
    * Left-rotates a node `x`
    * @param x the node to perform left rotation
    */
-  void LeftRotate(Pointer x) {
-    Pointer y = x->right_;
+  void LeftRotate(Node* x) {
+    Node* y = x->right_;
     y->parent_ = x->parent_;
     if (y->parent_ == nullptr) {
       // resolve name look-up problem
@@ -110,11 +164,12 @@ class AVL : public BST<Type> {
    * Right-rotates a node `x`
    * @param x the node to perform right rotation
    */
-  void RightRotate(Pointer x) {
-    Pointer y = x->left_;
-    Pointer p = x->parent_;
+  void RightRotate(Node* x) {
+    Node* y = x->left_;
+    Node* p = x->parent_;
     y->parent_ = x->parent_;
     if (p == nullptr) {
+      // resolve name look-up problem
       this->root_ = y;
     } else {
       if (p->left_ == x) {
@@ -137,7 +192,7 @@ class AVL : public BST<Type> {
    * Checks the height of a node and rebalances if it violates the AVL tree property
    * @param node the node to perform rebalancing
    */
-  void Rebalance(Pointer node) {
+  void Rebalance(Node* node) {
     while (node != nullptr) {
       UpdateHeight(node);
       if (Height(node->left_) >= 2 + Height(node->right_)) {
@@ -158,6 +213,7 @@ class AVL : public BST<Type> {
       node = node->parent_;
     }
   }
+
 };
 
 } // namespace ds
