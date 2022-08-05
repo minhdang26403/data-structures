@@ -9,7 +9,6 @@ namespace ds {
 template<typename Type>
 class AVL : public BST<Type> {
  public:
-  // using BST<Type>::root_;
   using typename BST<Type>::Node;
 
   /** Default constructor */
@@ -142,7 +141,7 @@ class AVL : public BST<Type> {
     y->parent_ = x->parent_;
     if (y->parent_ == nullptr) {
       // resolve name look-up problem
-      this->root_ = y;
+      BST<Type>::root_ = y;
     } else {
       if (y->parent_->left_ == x) {
         y->parent_->left_ = y;
@@ -170,7 +169,7 @@ class AVL : public BST<Type> {
     y->parent_ = x->parent_;
     if (p == nullptr) {
       // resolve name look-up problem
-      this->root_ = y;
+      BST<Type>::root_ = y;
     } else {
       if (p->left_ == x) {
         p->left_ = y;
