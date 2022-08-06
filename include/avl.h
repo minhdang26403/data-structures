@@ -42,7 +42,7 @@ class AVL : public BST<Type> {
   /** Move constructor 
    * @param other the source AVL tree to move from
    */
-  AVL(AVL&& other) : BST<Type>(std::move(other)) {}
+  AVL(AVL&& other) noexcept : BST<Type>(std::move(other)) {}
 
   /** Destructor */
   ~AVL() = default;
@@ -212,7 +212,6 @@ class AVL : public BST<Type> {
       node = node->parent_;
     }
   }
-
 };
 
 } // namespace ds

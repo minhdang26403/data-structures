@@ -15,12 +15,27 @@ class BST {
   struct Node {
     Type value_;
     int height_;
-    Node* parent_;
-    Node* left_;
-    Node* right_;
+    Node* parent_{};
+    Node* left_{};
+    Node* right_{};
 
+    /** Default constructor */
     Node() : Node(0) {}
-    Node(const Type& value, Node* parent=nullptr, Node* left=nullptr, Node *right=nullptr)
+
+    /**
+     *Construct a new Node object
+     * @param value the value of the node
+     */
+    Node(const Type& value) : value_(value) {}
+
+    /**
+     * Construct a new Node object
+     * @param value the value of the node
+     * @param parent the pointer to the parent node
+     * @param left the pointer to the left node
+     * @param right the pointer to the right node
+     */
+    Node(const Type& value, Node* parent, Node* left, Node *right)
       : value_(value), parent_(parent), left_(left), right_(right) {}
   };
 
@@ -57,7 +72,7 @@ class BST {
   /** Move constructor 
    * @param other the source BST to move from
    */
-  BST(BST&& other) {
+  BST(BST&& other) noexcept {
     other.Swap(*this);
   }
 
