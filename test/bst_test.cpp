@@ -63,6 +63,12 @@ void TestCustomConstructor() {
   assert(tree2.Search("qaz") != nullptr);
 }
 
+void Test5() {
+  ds::BST<std::string> tree1 = {"abc", "esi", "def", "sv", "nvch"};
+  // Can't do this if the copy constructor is explicit
+  ds::BST<std::string> tree2 = tree1;
+}
+
 int main() {
   TestInsert();
   TestDelete();

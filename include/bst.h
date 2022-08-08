@@ -26,7 +26,7 @@ class BST {
      *Construct a new Node object
      * @param value the value of the node
      */
-    Node(const Type& value) : value_(value) {}
+    explicit Node(const Type& value) : value_(value) {}
 
     /**
      * Construct a new Node object
