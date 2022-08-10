@@ -17,6 +17,7 @@ PROGRAMS = vector_test \
 	heap_test \
 	avl_test \
 	sorting_test \
+	red_black_tree_test \
 
 all: $(PROGRAMS)
 
@@ -45,6 +46,9 @@ avl_test: $(TESTDIR)/avl_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 sorting_test: $(TESTDIR)/sorting_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+red_black_tree_test: $(TESTDIR)/red_black_tree_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 clean:
