@@ -15,15 +15,15 @@ class BST {
   struct Node {
     Type value_;
     int height_;
-    Node* parent_{};
-    Node* left_{};
-    Node* right_{};
+    Node *parent_{};
+    Node *left_{};
+    Node *right_{};
 
     /** Default constructor */
-    Node() : Node(0) {}
+    Node() : Node(Type()) {}
 
     /**
-     *Construct a new Node object
+     * Construct a new Node object
      * @param value the value of the node
      */
     explicit Node(const Type& value) : value_(value) {}
@@ -35,19 +35,21 @@ class BST {
      * @param left the pointer to the left node
      * @param right the pointer to the right node
      */
-    Node(const Type& value, Node* parent, Node* left, Node *right)
+    Node(const Type& value, Node *parent, Node *left, Node *right)
       : value_(value), parent_(parent), left_(left), right_(right) {}
   };
+
+  /** ---------- Binary Search Tree ---------- */
 
   /** Default constructor */
   BST() = default;
 
   /**
    * Construct a new BST from a list of elements
-   * @param other the list of elements
+   * @param data the list of elements
    */
-  BST(Vector<Type>& other) {
-    for (const auto& ele : other) {
+  BST(Vector<Type>& data) {
+    for (const auto& ele : data) {
       Insert(ele);
     }
   }
@@ -100,9 +102,7 @@ class BST {
     return *this;
   }
 
-  /**
-   * @return a pointer to the root of the tree
-   */
+  /** @return a pointer to the root of the tree */
   Node* GetRoot() {
     return root_;
   }
@@ -113,7 +113,7 @@ class BST {
    * @return the pointer to the tree node containing the value
    */
   Node* Search(const Type& value) {
-    Node* node = root_;
+    Node *node = root_;
     while (node != nullptr && node->value_ != value) {
       if (value < node->value_) {
         node = node->left_;
@@ -129,7 +129,7 @@ class BST {
    * @param node the root of that subtree
    * @return the pointer to the tree node containing the minimum value
    */
-  Node* Minimum(Node* node) {
+  Node* Minimum(Node *node) {
     while (node != nullptr && node->left_ != nullptr) {
       node = node->left_;
     }
@@ -141,7 +141,7 @@ class BST {
    * @param node the root of that subtree
    * @return the pointer to the tree node containing the maximum value
    */
-  Node* Maximum(Node* node) {
+  Node* Maximum(Node *node) {
     while (node != nullptr && node->right_ != nullptr) {
       node = node->right_;
     }
@@ -153,11 +153,11 @@ class BST {
    * @param node the node to find its successor
    * @return a pointer to the successor node
    */
-  Node* Successor(Node* node) {
+  Node* Successor(Node *node) {
     if (node->right_ != nullptr) {
       return Minimum(node->right_);
     }
-    while (node->parent_ != nullptr && node != node->parent_->right_) {
+    while (node->parent_ != nullptr && node == node->parent_->right_) {
       node = node->parent_;
     }
     return node->parent_;
@@ -168,11 +168,11 @@ class BST {
    * @param node the node to find its predecessor
    * @return a pointer to the predecessor node
    */
-  Node* Predecessor(Node* node) {
+  Node* Predecessor(Node *node) {
     if (node->left_ != nullptr) {
       return Maximum(node->left_);
     }
-    while (node->parent_ != nullptr && node != node->parent_->left_) {
+    while (node->parent_ != nullptr && node == node->parent_->left_) {
       node = node->parent_;
     }
     return node->parent_;
@@ -185,8 +185,8 @@ class BST {
    */
   Node* Insert(const Type& value) {
     auto new_node = new Node(value);
-    Node* parent = nullptr;
-    Node* cur = root_;
+    Node *parent = nullptr;
+    Node *cur = root_;
     while (cur != nullptr) {
       parent = cur;
       if (value < cur->value_) {
@@ -207,12 +207,12 @@ class BST {
   }
 
   /**
-   * Deletes a value from the BST
+   * Deletes a node with `value` value from the BST
    * @param value the value to delete
    * @return true if deletion succeeds; otherwise, false
    */
   bool Delete(const Type& value) {
-    Node* node = Search(value);
+    Node *node = Search(value);
     if (node == nullptr) {
       return false;
     }
@@ -221,7 +221,7 @@ class BST {
     } else if (node->right_ == nullptr) {
       Transplant(node, node->left_);
     } else {
-      Node* successor = Minimum(node->right_);
+      Node *successor = Minimum(node->right_);
       if (successor->parent_ != node) {
         Transplant(successor, successor->right_);
         successor->right_ = node->right_;
@@ -260,14 +260,14 @@ class BST {
  protected:
   /**
    * Inorder traverses the BST
-   * @param root_ the root of the subtree
+   * @param root the root of the current subtree
    * @param data the list of values we've gone through
    */
-  void InorderTraversal(Node* root_, Vector<Type>& data) {
-    if (root_ != nullptr) {
-      InorderTraversal(root_->left_, data);
-      data.PushBack(root_->value_);
-      InorderTraversal(root_->right_, data);
+  void InorderTraversal(Node *root, Vector<Type> &data) {
+    if (root != nullptr) {
+      InorderTraversal(root->left_, data);
+      data.PushBack(root->value_);
+      InorderTraversal(root->right_, data);
     }
   }
 
@@ -276,7 +276,7 @@ class BST {
    * @param u subtree to be replaced
    * @param v subtree to replace
    */
-  void Transplant(Node* u, Node* v) {
+  void Transplant(Node *u, Node *v) {
     if (u->parent_ == nullptr) {
       root_ = v;
     } else if (u->parent_->left_ == u) {
@@ -294,23 +294,23 @@ class BST {
    * @param root the root of the current subtree
    * @return a pointer to the root of that subtree
    */
-  Node* BuildTree(Node* root, Node* parent) {
-    if (root != nullptr) {
-      Node* node = new Node(root->value_);
-      node->parent_ = parent;
-      node->height_ = root->height_;  
-      node->left_ = BuildTree(root->left_, node);
-      node->right_ = BuildTree(root->right_, node);
-      return node;
+  Node* BuildTree(Node *root, Node *parent) {
+    if (root == nullptr) {
+      return nullptr;
     }
-    return nullptr;
+    Node *node = new Node(root->value_);
+    node->parent_ = parent;
+    node->height_ = root->height_;  
+    node->left_ = BuildTree(root->left_, node);
+    node->right_ = BuildTree(root->right_, node);
+    return node;
   }
 
   /**
    * Recursively destroy the BST
    * @param root the root of the tree
    */
-  void DestructTree(Node* root) {
+  void DestructTree(Node *root) {
     if (root == nullptr) {
       return;
     }
@@ -319,13 +319,16 @@ class BST {
     delete root;
   }
 
+  /** Swaps data members of two objects 
+   * @param rhs the object to swap with
+   */
   void Swap(BST& rhs) {
     using std::swap;
     swap(root_, rhs.root_);
   }
 
   // The root of the tree
-  Node* root_{};
+  Node *root_{};
 };
 
 } // namespace ds

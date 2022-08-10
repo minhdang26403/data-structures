@@ -16,10 +16,10 @@ class AVL : public BST<Type> {
 
   /**
    * Construct a new AVL tree from a list of elements
-   * @param other the list of elements
+   * @param data the list of elements
    */
-  AVL(Vector<Type>& other) {
-    for (const auto& ele : other) {
+  AVL(Vector<Type>& data) {
+    for (const auto& ele : data) {
       Insert(ele);
     }
   }
@@ -78,25 +78,24 @@ class AVL : public BST<Type> {
   }
 
   /**
-   * Deletes a value from the AVL tree
-   * @param value the value to delete
+   * Deletes a node with `value` value from the AVL tree
+   * @param value the value of the node to delete
    * @return true if deletion succeeds; otherwise, false
    */
   bool Delete(const Type& value) {
-    Node* node = BST<Type>::Search(value);
+    Node *node = BST<Type>::Search(value);
     if (node == nullptr) {
       return false;
     }
     // the parent of the physically deleted node, used for rebalacing
-    Node* action_node;
+    Node *action_node;
+    action_node = node->parent_;
     if (node->left_ == nullptr) {
-      action_node = node->parent_;
       BST<Type>::Transplant(node, node->right_);
     } else if (node->right_ == nullptr) {
-      action_node = node->parent_;
       BST<Type>::Transplant(node, node->left_);
     } else {
-      Node* successor = BST<Type>::Minimum(node->right_);
+      Node *successor = BST<Type>::Minimum(node->right_);
       action_node = successor->parent_;
       if (successor->parent_ != node) {
         BST<Type>::Transplant(successor, successor->right_);
@@ -117,7 +116,7 @@ class AVL : public BST<Type> {
   * @param node the node to get height
   * @return the height of the node
   */
-  int Height(Node* node) {
+  int Height(Node *node) {
     if (node == nullptr) {
       return -1;
     }
@@ -128,16 +127,16 @@ class AVL : public BST<Type> {
    * Calculates the height of a node
    * @param node the node to calculate the height
    */
-  void UpdateHeight(Node* node) {
+  void UpdateHeight(Node *node) {
     node->height_ = std::max(Height(node->left_), Height(node->right_)) + 1;
   }
 
   /**
-   * Left-rotates a node `x`
+   * Left-rotates on node `x`
    * @param x the node to perform left rotation
    */
-  void LeftRotate(Node* x) {
-    Node* y = x->right_;
+  void LeftRotate(Node *x) {
+    Node *y = x->right_;
     y->parent_ = x->parent_;
     if (y->parent_ == nullptr) {
       // resolve name look-up problem
@@ -160,21 +159,20 @@ class AVL : public BST<Type> {
   }
 
   /**
-   * Right-rotates a node `x`
+   * Right-rotates on node `x`
    * @param x the node to perform right rotation
    */
-  void RightRotate(Node* x) {
-    Node* y = x->left_;
-    Node* p = x->parent_;
+  void RightRotate(Node *x) {
+    Node *y = x->left_;
     y->parent_ = x->parent_;
-    if (p == nullptr) {
+    if (y->parent_ == nullptr) {
       // resolve name look-up problem
       BST<Type>::root_ = y;
     } else {
-      if (p->left_ == x) {
-        p->left_ = y;
-      } else if (p->right_ == x) {
-        p->right_ = y;
+      if (y->parent_->left_ == x) {
+        y->parent_->left_ = y;
+      } else if (y->parent_->right_ == x) {
+        y->parent_->right_ = y;
       }
     }
     x->left_ = y->right_;
