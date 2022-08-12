@@ -18,6 +18,7 @@ PROGRAMS = vector_test \
 	avl_test \
 	sorting_test \
 	red_black_tree_test \
+	undirected_graph_test \
 
 all: $(PROGRAMS)
 
@@ -49,6 +50,12 @@ sorting_test: $(TESTDIR)/sorting_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 red_black_tree_test: $(TESTDIR)/red_black_tree_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+undirected_graph_test: $(TESTDIR)/undirected_graph_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+bfs_test: $(TESTDIR)/bfs_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 clean:
