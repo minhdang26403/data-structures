@@ -375,7 +375,7 @@ class LinkedList {
 
   /** Removes the first element of the linked list */
   void PopFront() {
-    Erase(0);
+    Erase(static_cast<SizeType>(0));
   }
 
   void Reverse() noexcept {

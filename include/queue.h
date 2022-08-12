@@ -60,9 +60,11 @@ class Queue {
   }
 
   /** Removes an element from the front of the queue */
-  void Dequeue() {
+  Type Dequeue() {
     CheckQueue();
+    Type ele = queue_.Front();
     queue_.PopFront();
+    return ele;
   }
 
  private:

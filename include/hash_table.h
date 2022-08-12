@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "linked_list.h"
+#include "vector.h"
 
 namespace ds {
 template<typename KeyType, typename ValueType>
@@ -114,6 +115,14 @@ class HashTable {
   /** @return true if the hash table is empty; otherwise, false */
   bool IsEmpty() const { return Size() == 0; }
 
+  /** Insert a key (with default value) into the hash table.
+   * If the key is already exists, modify the value of that key
+   * @param key the key to insert
+   */
+  void Insert(const KeyType& key) {
+    Insert(key, ValueType());
+  }
+
   /** Insert a key-value pair into the hash table.
    * If the key is already exists, modify the value of that key
    * @param key the key to insert
@@ -163,6 +172,30 @@ class HashTable {
       }
     }
     throw std::out_of_range("The key doesn't exist\n");
+  }
+
+  ValueType& operator[](const KeyType& key) {
+    uint32_t index = KeyToIndex(key);
+    for (auto& entry : table_[index]) {
+      if (entry.key_ == key) {
+        return entry.value_;
+      }
+    }
+    throw std::out_of_range("The key doesn't exist\n");
+  }
+
+  /**
+   * Retrieves all the keys from the hash table
+   * @return a list of keys in the hash table
+   */
+  Vector<KeyType> GetKeys() {
+    Vector<KeyType> keys;
+    for (SizeType idx = 0; idx < capacity_; ++idx) {
+      for (const auto &entry : table_[idx]) {
+        keys.PushBack(entry.key_);
+      }
+    }
+    return keys;
   }
 
   /** Checks if the hash table contains the `key` key
