@@ -2,9 +2,7 @@
 #define BFS_H_
 
 #include "graph.h"
-#include <iostream>
 #include "queue.h"
-#include "vertex.h"
 
 namespace ds {
 /**
