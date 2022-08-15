@@ -1,7 +1,5 @@
 #include "graph.h"
 
-#include <iostream>
-
 void Test1() {
   std::cout << "----------Undirected Graph Test----------\n";
   ds::Graph<int> graph(ds::GraphType::UNDIRECTED);
@@ -18,9 +16,6 @@ void Test1() {
   graph.AddEdge(v3, v4);
   graph.AddEdge(v4, v5);
   graph.Print();
-
-  std::cout << "----------BFS on Undirected Graph Test----------\n";
-  graph.BFS(v1);
 }
 
 void Test2() {
@@ -41,11 +36,8 @@ void Test2() {
   graph.AddEdge(v5, v4);
   graph.AddEdge(v6, v6);
   graph.Print();
-  
-  std::cout << "----------BFS on Directed Graph Test----------\n";
-  graph.BFS(v3);
-  std::cout << v2->distance_ << '\n';
 }
+
 
 int main() {
   Test1();
