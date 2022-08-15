@@ -12,6 +12,8 @@ struct Vertex {
   Color color_;
   Vertex *parent_{};
   int distance_{};
+  int start_{};
+  int finish_{};
 
   /** Default constructor */
   Vertex() = default;
