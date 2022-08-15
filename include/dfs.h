@@ -2,8 +2,6 @@
 #define DFS_H_
 
 #include "graph.h"
-#include <iostream>
-#include "vertex.h"
 
 namespace ds {
 /** Explores the graph using Depth-first search 
