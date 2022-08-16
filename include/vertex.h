@@ -9,8 +9,8 @@ enum class Color {WHITE, GRAY, BLACK};
 template<typename Type>
 struct Vertex {
   Type value_{};
-  Color color_;
-  Vertex *parent_{};
+  Color color_{Color::WHITE};
+  Vertex *parent_ {nullptr};
   int distance_{};
   int start_{};
   int finish_{};
