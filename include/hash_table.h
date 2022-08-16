@@ -138,6 +138,7 @@ class HashTable {
     }
     if (size_ > max_load_factor_*capacity_) {
       GrowTable();
+      index = KeyToIndex(key);
     }
     table_[index].EmplaceFront(key, value);
     ++size_;
@@ -237,14 +238,16 @@ class HashTable {
    * Grows the hash table 
    */
   void GrowTable() {
-    auto new_table = new LinkedList<EntryType>[capacity_*2];
-    for (SizeType idx = 0; idx < capacity_; ++idx) {
+    SizeType old_capacity = capacity_;
+    // Modify capacity first since it used for hashing
+    capacity_ *= 2;
+    auto new_table = new LinkedList<EntryType>[capacity_];
+    for (SizeType idx = 0; idx < old_capacity; ++idx) {
       for (const auto &entry : table_[idx]) {
         uint32_t new_idx = KeyToIndex(entry.key_);
         new_table[new_idx].PushFront(entry);
       }
     }
-    capacity_ *= 2;
     delete []table_;
     table_ = new_table;
   }
