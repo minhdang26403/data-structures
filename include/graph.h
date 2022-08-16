@@ -41,7 +41,11 @@ class Graph {
    * @return a pointer to the vertex
    */
   vertex_ptr AddVertex(const Type& value) {
-    auto vertex = new Vertex<Type>(value);
+    if (vertex_values_.Contains(value)) {
+      std::cerr << "The graph doesn't allow duplicate vertex values\n";
+      return nullptr;
+    }
+    vertex_ptr vertex = new Vertex<Type>(value);
     adj_list_.Insert(vertex);
     vertex_values_.Insert(value, vertex);
     ++vertices_;
@@ -54,8 +58,8 @@ class Graph {
    * @param v_value the value of vertex v
    * @return true if add an edge successfully; otherwise, false
    */
-  bool AddEdge(const Type& u_value, const Type& v_value) {
-    return AddEdge(GetVertex(u_value), GetVertex(v_value));
+  bool AddEdge(const Type& u_value, const Type& v_value, int weight=INT_MIN) {
+    return AddEdge(GetVertex(u_value), GetVertex(v_value), weight);
   }
 
   /**
@@ -64,15 +68,17 @@ class Graph {
    * @param v vertex
    * @return true if add an edge successfully; otherwise, false
    */
-  bool AddEdge(vertex_ptr u, vertex_ptr v) {
+  bool AddEdge(vertex_ptr u, vertex_ptr v, int weight=INT_MIN) {
     if (type_ == GraphType::UNDIRECTED) {
       if (u == v) {
         std::cout << "An undirected graph doesn't allow self-loops\n";
         return false;
       }
       adj_list_[v].PushBack(u);
+      v->weights_.Insert(u, weight);
     }
     adj_list_[u].PushBack(v);
+    u->weights_.Insert(v, weight);
     ++edges_;
     return true;
   }
@@ -98,7 +104,9 @@ class Graph {
   int GetEdgesCount() const { return edges_; }
 
   /** @return the type of the graph */
-  GraphType GetType() const { return type_; }
+  GraphType GetGraphType() const { return type_; }
+
+  int GetWeight(vertex_ptr u, vertex_ptr v) const { return u->weights_[v]; }
   
   /**
    * Get the vertex with `value` value
@@ -112,7 +120,7 @@ class Graph {
     Vector<vertex_ptr> vertices = adj_list_.GetKeys();
     for (int i = vertices.Size() - 1; i > -1; --i) {
       std::cout << vertices[i]->value_ << ": [";
-      for (const auto v : adj_list_[vertices[i]]) {
+      for (const auto &v : adj_list_[vertices[i]]) {
         std::cout << v->value_ << ", ";
       }
       std::cout << "]\n";
@@ -176,11 +184,22 @@ class Graph {
    */
   Vector<vertex_ptr> TopologicalSort() {
   // Validation
-  if (GetType() == GraphType::UNDIRECTED) {
+  if (GetGraphType() == GraphType::UNDIRECTED) {
     std::cerr << "Can't perform topological sort on undirected graph";
   }
 
-  return DFSOrder();
+  Vector<vertex_ptr> vertices = GetVertices();
+  int v_count = GetVerticesCount();
+  Vector<vertex_ptr> ordering(v_count, nullptr);
+  int idx = v_count - 1;
+  int time = 0;
+  bool print_out = true, check_cycle = true;
+  for (const auto& vertex : vertices) {
+    if (vertex->color_ == Color::WHITE) {
+      DFSVisit(vertex, time, ordering, idx, print_out, check_cycle);
+    }
+  }
+  return ordering;
 }
 
 /**
@@ -188,11 +207,24 @@ class Graph {
  * @return roots of the depth-first trees in components
  */
 Vector<vertex_ptr> FindStronglyConnectedComponents() {
-  if (GetType() == GraphType::UNDIRECTED) {
+  if (GetGraphType() == GraphType::UNDIRECTED) {
     std::cerr << "Can't find strongly connected components on undirected graph";
   }
   // Step 1: Use DFS to compute v.f for each vertex v
-  Vector<vertex_ptr> ordering = DFSOrder();
+  Vector<vertex_ptr> vertices = GetVertices();
+
+  int v_count = GetVerticesCount();
+  Vector<vertex_ptr> ordering(v_count, nullptr);
+  int idx = v_count - 1;
+  
+  int time = 0;
+  bool print_out = true;
+
+  for (const auto& vertex : vertices) {
+    if (vertex->color_ == Color::WHITE) {
+      DFSVisit(vertex, time, ordering, idx, print_out);
+    }
+  }
 
   // Step 2: Create the transpose of the graph
   Graph<Type> transpose_graph(GraphType::DIRECTED);
@@ -201,7 +233,7 @@ Vector<vertex_ptr> FindStronglyConnectedComponents() {
 
   // Step 3: Consider the vertices in order of decreasing finish time
   Vector<vertex_ptr> components;
-  int time = 0;
+  time = 0;
   for (const auto &vertex : ordering) {
     auto transpose_vertex = transpose_graph.GetVertex(vertex->value_);
     if (transpose_vertex->color_ == Color::WHITE) {
@@ -240,19 +272,23 @@ Vector<vertex_ptr> FindStronglyConnectedComponents() {
   }
 
   /**
-   * Recursively visits the neighbors of a vertex. Used for topological sort
+   * Recursively visits the neighbors of a vertex. Used as a subroutine for topological sort
    * @param vertex the vertex to start searching from
    * @param time the logical time of the procedure
    * @param ordering the list of vertex in topological order
    * @param idx the idx to store vertex
    * @param print whether to print for debugging or not
    */
-  void DFSVisit(vertex_ptr vertex, int& time, Vector<vertex_ptr> &ordering, int &idx, bool print) {
+  void DFSVisit(vertex_ptr vertex, int& time, Vector<vertex_ptr> &ordering, int &idx, bool print, bool detect_cycle=false) {
     ++time;
     vertex->start_ = time;
     vertex->color_ = Color::GRAY;
     LinkedList<vertex_ptr> neighbors = GetNeighbors(vertex);
     for (const auto& neighbor : neighbors) {
+      if (detect_cycle && neighbor->color_ == Color::GRAY) {
+        std::cerr << "The graph contains cycle\n";
+        return;
+      }
       if (neighbor->color_ == Color::WHITE) {
         neighbor->parent_ = vertex;
         DFSVisit(neighbor, time, ordering, idx, print);
@@ -265,24 +301,6 @@ Vector<vertex_ptr> FindStronglyConnectedComponents() {
     if (print) {
       std::cout << vertex->value_ << '\t' << vertex->start_ << '\t' << vertex->finish_ << '\n';
     }
-  }
-
-  /** 
-   * Same as DFS, but return a list of vertices in decreasing finishing time 
-   * @return a list of pointers to vertices with decreasing search finish time 
-   */
-  Vector<vertex_ptr> DFSOrder() {
-    Vector<vertex_ptr> vertices = GetVertices();
-    int v_count = GetVerticesCount();
-    Vector<vertex_ptr> ordering(v_count, nullptr);
-    int idx = v_count - 1;
-    int time = 0;
-    for (const auto& vertex : vertices) {
-      if (vertex->color_ == Color::WHITE) {
-        DFSVisit(vertex, time, ordering, idx, true);
-      }
-    }
-    return ordering;
   }
 
   /**
