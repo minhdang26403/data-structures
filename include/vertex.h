@@ -1,6 +1,7 @@
 #ifndef VERTEX_H_
 #define VERTEX_H_
 
+#include "hashtable.h"
 #include <functional>
 
 namespace ds {
@@ -14,6 +15,8 @@ struct Vertex {
   int distance_{};
   int start_{};
   int finish_{};
+  // weights of path to each adjacent vertex
+  HashTable<Vertex<Type>*, int> weights_;
 
   /** Default constructor */
   Vertex() = default;
