@@ -19,7 +19,6 @@ PROGRAMS = vector_test \
 	sorting_test \
 	red_black_tree_test \
 	graph_test \
-	bfs_test \
 
 all: $(PROGRAMS)
 
@@ -54,9 +53,6 @@ red_black_tree_test: $(TESTDIR)/red_black_tree_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 graph_test: $(TESTDIR)/graph_test.cpp
-	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
-
-bfs_test: $(TESTDIR)/bfs_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 clean:
