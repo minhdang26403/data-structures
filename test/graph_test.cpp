@@ -136,13 +136,87 @@ void TestSCC() {
 
 }
 
-int main() {
-  TestGraph1();
-  TestGraph2();
-  TestBFS();
-  TestDFS();
-  TestTopologicalSort();
-  TestSCC();
+void TestDijkstra() {
+  std::cout << "----------Dijkstra's algorithm Test----------\n";
+  ds::Vector<char> vertices = {'s', 't', 'x', 'y', 'z'};
+  ds::Graph<char> graph(ds::GraphType::DIRECTED);
+  for (const auto& v : vertices) {
+    graph.AddVertex(v);
+  }
+  ds::Vertex<char>* source = graph.GetVertex('s');
+  graph.AddEdge('s', 't', 10);
+  graph.AddEdge('s', 'y', 5);
+  graph.AddEdge('t', 'x', 1);
+  graph.AddEdge('t', 'y', 2);
+  graph.AddEdge('x', 'z', 4);
+  graph.AddEdge('y', 't', 3);
+  graph.AddEdge('y', 'x', 9);
+  graph.AddEdge('y', 'z', 2);
+  graph.AddEdge('z', 's', 7);
+  graph.AddEdge('z', 'x', 6);
+  graph.Dijkstra(source);
+  assert(graph.GetVertex('s')->distance_ == 0);
+  assert(graph.GetVertex('t')->distance_ == 8);
+  assert(graph.GetVertex('x')->distance_ == 9);
+  assert(graph.GetVertex('y')->distance_ == 5);
+  assert(graph.GetVertex('z')->distance_ == 7);
+  graph.PrintDistance(source);
+}
 
+void TestBellmanFord1() {
+  std::cout << "----------Bellman-Ford algorithm without negative cycles Test----------\n";
+  ds::Graph<char> graph(ds::GraphType::DIRECTED);
+  auto s = graph.AddVertex('s');
+  auto t = graph.AddVertex('t');
+  auto x = graph.AddVertex('x');
+  auto y = graph.AddVertex('y');
+  auto z = graph.AddVertex('z');
+  graph.AddEdge(s, t, 6);
+  graph.AddEdge(s, y, 7);
+  graph.AddEdge(t, x, 5);
+  graph.AddEdge(t, y, 8);
+  graph.AddEdge(t, z, -4);
+  graph.AddEdge(x, t, -2);
+  graph.AddEdge(y, x, -3);
+  graph.AddEdge(y, z, 9);
+  graph.AddEdge(z, s, 2);
+  graph.AddEdge(z, x, 7);
+  graph.BellmanFord(s);
+  graph.PrintDistance(s);
+}
+
+void TestBellmanFord2() {
+  std::cout << "----------Bellman-Ford algorithm with negative cycles Test----------\n";
+  ds::Graph<char> graph(ds::GraphType::DIRECTED);
+  auto s = graph.AddVertex('s');
+  auto t = graph.AddVertex('t');
+  auto x = graph.AddVertex('x');
+  auto y = graph.AddVertex('y');
+  auto z = graph.AddVertex('z');
+  graph.AddEdge(s, t, 6);
+  graph.AddEdge(s, y, 7);
+  graph.AddEdge(t, x, 5);
+  graph.AddEdge(t, y, 8);
+  graph.AddEdge(t, z, -4);
+  graph.AddEdge(x, t, -6);
+  graph.AddEdge(y, x, -3);
+  graph.AddEdge(y, z, 9);
+  graph.AddEdge(z, s, 2);
+  graph.AddEdge(z, x, 7);
+  graph.BellmanFord(s);
+  graph.PrintDistance(s);
+}
+
+int main() {
+  // TestGraph1();
+  // TestGraph2();
+  // TestBFS();
+  // TestDFS();
+  // TestTopologicalSort();
+  // TestSCC();
+  // TestDijkstra();
+  // TestBellmanFord1();
+  TestBellmanFord2();
+  
   return 0;
 }
