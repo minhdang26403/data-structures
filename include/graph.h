@@ -4,6 +4,7 @@
 #include <climits>
 
 #include "hash_table.h"
+#include "indexed_pq.h"
 #include "linked_list.h"
 #include "queue.h"
 #include "vector.h"
@@ -71,7 +72,7 @@ class Graph {
   bool AddEdge(vertex_ptr u, vertex_ptr v, int weight=INT_MIN) {
     if (type_ == GraphType::UNDIRECTED) {
       if (u == v) {
-        std::cout << "An undirected graph doesn't allow self-loops\n";
+        std::cerr << "An undirected graph doesn't allow self-loops\n";
         return false;
       }
       adj_list_[v].PushBack(u);
@@ -117,7 +118,7 @@ class Graph {
 
   /** For debugging */
   void Print() {
-    Vector<vertex_ptr> vertices = adj_list_.GetKeys();
+    Vector<vertex_ptr> vertices = GetVertices();
     for (int i = vertices.Size() - 1; i > -1; --i) {
       std::cout << vertices[i]->value_ << ": [";
       for (const auto &v : adj_list_[vertices[i]]) {
@@ -126,6 +127,19 @@ class Graph {
       std::cout << "]\n";
     }
   }
+
+  /**
+   * Prints the distance of each vertex from the source vertex `s`
+   * @param s a pointer to the source vertex
+   */
+  void PrintDistance(vertex_ptr s) {
+    Vector<vertex_ptr> vertices = GetVertices();
+    for (int i = vertices.Size() - 1; i > -1; --i) {
+      auto vertex = vertices[i];
+      std::cout << "The shortest distance from " << s->value_ << " to " << vertex->value_ << ": " << vertex->distance_ << '\n';
+    }
+  }
+
 
   /** ---------- Algorithms on graph ---------- */
 
@@ -183,67 +197,156 @@ class Graph {
    * @return a list of vertices in the topological order
    */
   Vector<vertex_ptr> TopologicalSort() {
-  // Validation
-  if (GetGraphType() == GraphType::UNDIRECTED) {
-    std::cerr << "Can't perform topological sort on undirected graph";
+    // Validation
+    if (GetGraphType() == GraphType::UNDIRECTED) {
+      std::cerr << "Can't perform topological sort on undirected graph";
+      exit(1);
+    }
+
+    Vector<vertex_ptr> vertices = GetVertices();
+    int v_count = GetVerticesCount();
+    Vector<vertex_ptr> ordering(v_count, nullptr);
+    int idx = v_count - 1;
+    int time = 0;
+    bool print_out = true, check_cycle = true;
+    for (const auto& vertex : vertices) {
+      if (vertex->color_ == Color::WHITE) {
+        DFSVisit(vertex, time, ordering, idx, print_out, check_cycle);
+      }
+    }
+    return ordering;
   }
 
-  Vector<vertex_ptr> vertices = GetVertices();
-  int v_count = GetVerticesCount();
-  Vector<vertex_ptr> ordering(v_count, nullptr);
-  int idx = v_count - 1;
-  int time = 0;
-  bool print_out = true, check_cycle = true;
-  for (const auto& vertex : vertices) {
-    if (vertex->color_ == Color::WHITE) {
-      DFSVisit(vertex, time, ordering, idx, print_out, check_cycle);
+  /**
+   * Find the strongly connected components of a graph (Kosaraju's algorithm)
+   * Time complexity: O(V + E)
+   * @return roots of the depth-first trees in components
+   */
+  Vector<vertex_ptr> FindStronglyConnectedComponents() {
+    if (GetGraphType() == GraphType::UNDIRECTED) {
+      std::cerr << "Can't find strongly connected components on undirected graph";
+      exit(1);
+    }
+    // Step 1: Use DFS to compute v.f for each vertex v
+    Vector<vertex_ptr> vertices = GetVertices();
+
+    int v_count = GetVerticesCount();
+    Vector<vertex_ptr> ordering(v_count, nullptr);
+    int idx = v_count - 1;
+
+    int time = 0;
+    bool print_out = true;
+
+    for (const auto& vertex : vertices) {
+      if (vertex->color_ == Color::WHITE) {
+        DFSVisit(vertex, time, ordering, idx, print_out);
+      }
+    }
+
+    // Step 2: Create the transpose of the graph
+    Graph<Type> transpose_graph(GraphType::DIRECTED);
+    CreateTransposeGraph(transpose_graph);
+
+
+    // Step 3: Consider the vertices in order of decreasing finish time
+    Vector<vertex_ptr> components;
+    time = 0;
+    for (const auto &vertex : ordering) {
+      auto transpose_vertex = transpose_graph.GetVertex(vertex->value_);
+      if (transpose_vertex->color_ == Color::WHITE) {
+        transpose_graph.DFSVisit(transpose_vertex, time, false);
+        // Push the vertex of the original graph to the result list, not the temporary transpose graph
+        components.PushBack(GetVertex(transpose_vertex->value_));
+      }
+    }
+    return components;
+  }
+
+  /**
+   * Finds the shortest path from the source vertex `s` to every other vertices in the graph
+   * Dijkstra's algorithm works on weighted, directed graph will nonnegative edge weights
+   * Time complexity: O(VlogV + ElogV)
+   * @param s a pointer to the source vertex
+   */
+  void Dijkstra(vertex_ptr s) {
+    if (GetGraphType() == GraphType::UNDIRECTED) {
+      std::cerr << "Dijkstra's algorithm: The graph must be directed\n";
+      exit(1);
+    }
+
+    InitializeSource(s);
+    IndexedPriorityQueue<vertex_ptr, int> queue;
+    HashTable<vertex_ptr, bool> visited;
+    for (const auto &u : GetVertices()) {
+      queue.Insert(u, u->distance_);
+      visited.Insert(u, false);
+    }
+
+    while (!queue.IsEmpty()) {
+      auto key_val = queue.Pop();
+      vertex_ptr u = key_val.first;
+      visited[u] = true;
+      for (const auto& v : GetNeighbors(u)) {
+        // The visited node already has the shortest path computed correctly.
+        // However, this is not true in case of negative edge weights
+        if (visited[v]) {
+          continue;
+        }
+        int new_distance = u->distance_ + GetWeight(u, v);
+        if (new_distance < v->distance_) {
+          v->distance_ = new_distance;
+          v->parent_ = u;
+          queue.Update(v, v->distance_);
+        }
+      }
     }
   }
-  return ordering;
-}
 
-/**
- * Find the strongly connected components of a graph (Kosaraju's algorithm)
- * @return roots of the depth-first trees in components
- */
-Vector<vertex_ptr> FindStronglyConnectedComponents() {
-  if (GetGraphType() == GraphType::UNDIRECTED) {
-    std::cerr << "Can't find strongly connected components on undirected graph";
-  }
-  // Step 1: Use DFS to compute v.f for each vertex v
-  Vector<vertex_ptr> vertices = GetVertices();
-
-  int v_count = GetVerticesCount();
-  Vector<vertex_ptr> ordering(v_count, nullptr);
-  int idx = v_count - 1;
-  
-  int time = 0;
-  bool print_out = true;
-
-  for (const auto& vertex : vertices) {
-    if (vertex->color_ == Color::WHITE) {
-      DFSVisit(vertex, time, ordering, idx, print_out);
+  /**
+   * Bellman-Ford algorithm solves the single-source shortest-paths problem in general case 
+   * (edge weights can be negative and the graph can have negative cycle)
+   * @param s a pointer to the source vertex
+   * @return false if the graph contains a negative cycle; otherwise, true
+   */
+  bool BellmanFord(vertex_ptr s) {
+    if (GetGraphType() == GraphType::UNDIRECTED) {
+      std::cerr << "Bellman-Ford algorithm: The graph must be directed\n";
+      exit(1);
     }
-  }
 
-  // Step 2: Create the transpose of the graph
-  Graph<Type> transpose_graph(GraphType::DIRECTED);
-  CreateTransposeGraph(transpose_graph);
-
-
-  // Step 3: Consider the vertices in order of decreasing finish time
-  Vector<vertex_ptr> components;
-  time = 0;
-  for (const auto &vertex : ordering) {
-    auto transpose_vertex = transpose_graph.GetVertex(vertex->value_);
-    if (transpose_vertex->color_ == Color::WHITE) {
-      transpose_graph.DFSVisit(transpose_vertex, time, false);
-      // Push the vertex of the original graph to the result list, not the temporary transpose graph0
-      components.PushBack(GetVertex(transpose_vertex->value_));
+    InitializeSource(s);
+    int num_vertices = GetVerticesCount();
+    // The algorithm can finish computation earlier than |V| - 1 iterations
+    bool relaxed_edge = true;
+    for (int i = 1; i < num_vertices - 1 && relaxed_edge; ++i) {
+      relaxed_edge = false;
+      // Go through total of |E| edges
+      for (const auto& vertex : GetVertices()) {
+        for (const auto& neighbor : GetNeighbors(vertex)) {
+          // Handle integer overflow
+          if (vertex->distance_ == INT_MAX) {
+            continue;
+          }
+          int new_distance = vertex->distance_ + GetWeight(vertex, neighbor);
+          if (new_distance < neighbor->distance_) {
+            neighbor->distance_ = new_distance;
+            relaxed_edge = true;
+          }
+        }
+      }
     }
+
+    for (const auto& vertex : GetVertices()) {
+      for (const auto& neighbor : GetNeighbors(vertex)) {
+        int new_distance = vertex->distance_ + GetWeight(vertex, neighbor);
+        if (new_distance < neighbor->distance_) {
+          std::cerr << "The graph contains a negative cycle\n";
+          return false;
+        }
+      }
+    }
+    return true;
   }
-  return components;
-}
 
  private:
   /**
@@ -319,6 +422,15 @@ Vector<vertex_ptr> FindStronglyConnectedComponents() {
         transpose.AddEdge(transpose.GetVertex(neighbor->value_), transpose.GetVertex(vertex->value_));
       }
     }
+  }
+
+  void InitializeSource(vertex_ptr s) {
+    auto vertices = GetVertices();
+    for (const auto& v : vertices) {
+      v->distance_ = INT_MAX;
+      v->parent_ = nullptr;
+    }
+    s->distance_ = 0;
   }
 
   // core data structure representing the graph
