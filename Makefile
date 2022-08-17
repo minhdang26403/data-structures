@@ -19,6 +19,7 @@ PROGRAMS = vector_test \
 	sorting_test \
 	red_black_tree_test \
 	graph_test \
+	indexed_pq_test \
 
 all: $(PROGRAMS)
 
@@ -53,6 +54,9 @@ red_black_tree_test: $(TESTDIR)/red_black_tree_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 graph_test: $(TESTDIR)/graph_test.cpp
+	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
+
+indexed_pq_test: $(TESTDIR)/indexed_pq_test.cpp
 	$(CPP) $(CFLAGS) -o $@ $^ $(INCLUDEDIR) $(LIBS)
 
 clean:
