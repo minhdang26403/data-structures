@@ -1,52 +1,41 @@
 #include "vector.h"
 
-#include <cassert>
-#include <iostream>
-#include <string>
 #include <gtest/gtest.h>
+#include <string>
 
-template <typename Type>
-std::ostream& operator<<(std::ostream& s, const stl::vector<Type>& v) {
-  s.put('[');
-  char comma[3] = {'\0', ' ', '\0'};
-  for (uint32_t i = 0; i < v.size(); ++i) {
-    s << comma << v[i];
-    comma[0] = ',';
-  }
-  return s << ']';
-}
+using namespace stl;
 
 TEST(VectorTest, TestConstructor) {
-  stl::vector<std::string> strs1 = {"abc", "def", "qwe"};
-  stl::vector<std::string> strs2(strs1);
+  vector<std::string> strs1 = {"abc", "def", "qwe"};
+  vector<std::string> strs2(strs1);
   // Check for deep copy
   strs2[2] = "xyz";
   EXPECT_TRUE(strs1[2] != strs2[2]);
 
   int count = 5;
   int value = 10;
-  stl::vector<int> data2(count, value);
+  vector<int> data2(count, value);
   for (int i = 0; i < count; i++) {
     EXPECT_TRUE(data2[i] == value);
   }
 
   // Move string1 to string3
-  stl::vector<std::string> strs3(std::move(strs1));
+  vector<std::string> strs3(stl::move(strs1));
   EXPECT_TRUE(strs1.size() == 0);
   EXPECT_TRUE(strs3.size() != 0);
 }
 
 TEST(VectorTest, TestAssignment) {
   using std::string;
-  stl::vector<string> strs1 = {"abc", "def", "qwe"};
-  stl::vector<string> strs2;
+  vector<string> strs1 = {"abc", "def", "qwe"};
+  vector<string> strs2;
   assert(strs2.size() == 0);
   strs2 = strs1;
   strs2[0] = "xyz";
   EXPECT_TRUE(strs1.front() != strs2.front());
 
-  stl::vector<string> strs3;
-  strs3 = std::move(strs2);
+  vector<string> strs3;
+  strs3 = stl::move(strs2);
   EXPECT_TRUE(strs3.size() != 0);
   EXPECT_TRUE(strs2.size() == 0);
 
@@ -56,7 +45,7 @@ TEST(VectorTest, TestAssignment) {
 }
 
 TEST(VectorTest, TestInsert) {
-  stl::vector<std::string> data1;
+  vector<std::string> data1;
   data1.push_back("abc");
   EXPECT_TRUE(data1.front() == "abc");
 
@@ -66,7 +55,7 @@ TEST(VectorTest, TestInsert) {
   }
   assert(data1[i - 1] == "def");
 
-  stl::vector<std::string> data2;
+  vector<std::string> data2;
   data2.insert(data2.begin(), "abc");
   EXPECT_TRUE(data2.size() == 1);
   EXPECT_TRUE(data2.front() == "abc");
@@ -80,7 +69,7 @@ TEST(VectorTest, TestInsert) {
 }
 
 TEST(VectorTest, TestRemove) {
-  stl::vector<std::string> data;
+  vector<std::string> data;
   data.insert(data.begin(), "abc");
   data.insert(data.begin() + 1, "def");
   data.insert(data.begin() + 1, "ghi");
@@ -92,19 +81,19 @@ TEST(VectorTest, TestRemove) {
 }
 
 TEST(VectorTest, TestIterator) {
-  stl::vector<std::string> data1 = {"ab", "cd", "ef", "gh"};
+  vector<std::string> data1 = {"ab", "cd", "ef", "gh"};
   int i = 0;
   for (const auto& s : data1) {
     EXPECT_TRUE(s == data1[i]);
     i++;
   }
 
-  stl::vector<int> data2;
+  vector<int> data2;
   for (int i = 0; i < 10; ++i) {
     data2.push_back(i);
   }
-  stl::vector<int> data3;
-  for (stl::vector<int>::iterator it = data2.begin(); it != data2.end(); ++it) {
+  vector<int> data3;
+  for (vector<int>::iterator it = data2.begin(); it != data2.end(); ++it) {
     data3.push_back(*it);
   }
 
@@ -112,7 +101,7 @@ TEST(VectorTest, TestIterator) {
 }
 
 TEST(VectorTest, TestEmplace) {
-  stl::vector<std::pair<int, int>> data1;
+  vector<std::pair<int, int>> data1;
   std::pair<int, int> a{1, 2};
   data1.push_back(a);
   data1.emplace_back(3, 4);

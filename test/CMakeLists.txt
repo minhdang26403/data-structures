@@ -1,4 +1,5 @@
 set(TESTS
+  stack_test
   vector_test
 )
 

@@ -1,85 +1,68 @@
 #ifndef STACK_H_
 #define STACK_H_
 
-#include <stdexcept>
-
 #include "vector.h"
 
-namespace ds {
-template<typename Type>
-class Stack {
+namespace stl {
+template<typename T>
+class stack {
  public:
-  using ValueType = Type;
-  using SizeType = std::size_t;
-  using Reference = ValueType&;
-  using ConstReference = const ValueType&;
- public:
-  Stack() = default;
-  Stack(const Stack& other) = default;
-  Stack(Stack&& other) noexcept = default;
-  Stack& operator=(const Stack& other) = default;
-  Stack& operator=(Stack&& other) noexcept = default;
-  ~Stack() = default;
+  using value_type = T;
+  using size_type = std::size_t;
+  using reference = value_type&;
+  using const_reference = const value_type&;
 
-  /** @return a reference to the element at the top of the stack */
-  Reference Top() {
-    CheckStack();
-    return data_.Back();
-  }
-  ConstReference Top() const {
-    CheckStack();
-    return data_.Back();
-  }
+ public:
+  stack() = default;
+  stack(const stack& other) = default;
+  stack(stack&& other) noexcept = default;
+  stack& operator=(const stack& other) = default;
+  stack& operator=(stack&& other) noexcept = default;
+  ~stack() = default;
+
+  /**
+   * @brief undefined behavior if called on an empty stack
+   * @return a reference to the element at the top of the stack
+   */
+  reference top() { return data_.back(); }
+
+  const_reference top() const { return data_.back(); }
 
   /** @return true if the stack is empty; otherwise, false */
-  bool IsEmpty() {
-    return data_.Size() == 0;
-  }
+  bool empty() { return data_.size() == 0; }
 
   /** @return the size of the stack */
-  SizeType Size() const {
-    return data_.Size();
-  }
+  size_type size() const { return data_.size(); }
 
   /**
    * Pushes the given element to the top of the stack 
    * @param value the value of the element to push
    */
-  void Push(const Type& value) {
-    data_.PushBack(value);
-  }
+  void push(const T& value) { data_.push_back(value); }
 
-  void Push(Type&& value) {
-    data_.PushBack(std::move(value));
-  }
+  void push(T&& value) { data_.push_back(stl::move(value)); }
 
   /**
    * Pushes a new element on top of the stack and constructs the element in-place
    * @param args arguments to forward to the constructor of the element
    */
   template<typename... Args>
-  void Emplace(Args&&... args) {
-    data_.EmplaceBack(std::forward<Args>(args)...);
+  void emplace(Args&&... args) {
+    data_.emplace_back(stl::forward<Args>(args)...);
   }
 
-  /** Removes the top element from the stack */
-  void Pop() {
-    CheckStack();
-    data_.PopBack();
-  }
+  /**
+   * Removes the top element from the stack. Calls pop on an empty stack 
+   * results in undefined behavior
+   */
+  void pop() { data_.pop_back(); }
 
   /** @return true if two stacks are the same; otherwise, false */
-  bool operator==(const Stack& rhs) {
-    return data_ == rhs.data_;
-  }
- private:
-  void CheckStack() {
-    if (IsEmpty()) {
-      throw std::out_of_range("The stack is empty.");
-    }
-  }
-  Vector<Type> data_;
-};
-} // namespace ds
+  bool operator==(const stack& rhs) { return data_ == rhs.data_; }
 
-#endif // STACK_H_
+ private:
+  vector<T> data_;
+};
+}  // namespace stl
+
+#endif  // STACK_H_

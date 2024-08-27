@@ -1,24 +1,14 @@
 #include "stack.h"
+#include <gtest/gtest.h>
 
-#include <cassert>
-#include <iostream>
-
-void Test1() {
-  ds::Stack<int> data;
-  data.Push(2);
-  data.Push(6);
-  data.Push(4);
-  assert(data.Size() == 3);
-  assert(data.Top() == 4);
-  data.Pop();
-  assert(data.Size() == 2);
-  assert(data.Top() == 6);
-}
-
-int main() {
-  Test1();
-
-  std::cout << "All test cases passed\n";
-
-  return 0;
+TEST(StackTest, BasicTest) {
+  stl::stack<int> data;
+  data.push(2);
+  data.push(6);
+  data.push(4);
+  EXPECT_TRUE(data.size() == 3);
+  EXPECT_TRUE(data.top() == 4);
+  data.pop();
+  EXPECT_TRUE(data.size() == 2);
+  EXPECT_TRUE(data.top() == 6);
 }

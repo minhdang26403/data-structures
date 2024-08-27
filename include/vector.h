@@ -14,7 +14,7 @@
 
 namespace stl {
 
-template <typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator = std::allocator<T>>
 class vector {
  public:
   /*====================Member types====================*/
@@ -79,8 +79,8 @@ class vector {
    * @param last iterator to one place beyond the last element
    */
 
-  template <typename InputIt,
-            typename = stl::enable_if_t<stl::is_pointer_v<InputIt>>>
+  template<typename InputIt,
+           typename = stl::enable_if_t<stl::is_pointer_v<InputIt>>>
   vector(InputIt first, InputIt last, const Allocator& alloc = Allocator())
       : allocator_(alloc) {
     assign(first, last);
@@ -183,7 +183,7 @@ class vector {
    * @param first iterator to the first element of the range
    * @param last iterator to one place beyond the last element of the range
    */
-  template <typename InputIt>
+  template<typename InputIt>
   void assign(InputIt first, InputIt last) {
     assign_impl(last - first, [&](size_type i) {
       for (auto it = first; it != last; it++) {
@@ -223,6 +223,7 @@ class vector {
     }
     return data_[pos];
   }
+
   const_reference at(size_type pos) const {
     if (pos < 0 || pos >= size()) {
       throw std::out_of_range("invalid index");
@@ -236,6 +237,7 @@ class vector {
    * @return reference to the requested element
    */
   reference operator[](size_type pos) { return data_[pos]; }
+
   const_reference operator[](size_type pos) const { return data_[pos]; }
 
   /**
@@ -244,6 +246,7 @@ class vector {
    * @return reference to the requested element
    */
   reference front() { return data_[0]; }
+
   const_reference front() const { return data_[0]; }
 
   /**
@@ -252,6 +255,7 @@ class vector {
    * @return reference to the requested element
    */
   reference back() { return data_[size() - 1]; }
+
   const_reference back() const { return data_[size() - 1]; }
 
   /**
@@ -259,6 +263,7 @@ class vector {
    * @return pointer to the underlying element storage
    */
   pointer data() noexcept { return data_; }
+
   const_pointer data() const noexcept { return data_; }
 
   /*==========Iterators==========*/
@@ -268,9 +273,11 @@ class vector {
    * @return iterator to the first element
    */
   iterator begin() noexcept { return static_cast<iterator>(data()); }
+
   const_iterator begin() const noexcept {
     return static_cast<const_iterator>(data());
   }
+
   const_iterator cbegin() const noexcept { return begin(); }
 
   /**
@@ -280,9 +287,11 @@ class vector {
    * @return iterator to the element following the last element of the vector
    */
   iterator end() noexcept { return static_cast<iterator>(data() + size()); }
+
   const_iterator end() const noexcept {
     return static_cast<const_iterator>(data() + size());
   }
+
   const_iterator cend() const noexcept { return end(); }
 
   /*==========Capacity==========*/
@@ -367,8 +376,8 @@ class vector {
    * @param last the element following the last element of the range
    * @return iterator to the first inserted element, or `pos` if `first == last`
    */
-  template <typename InputIt,
-            typename = stl::enable_if_t<stl::is_pointer_v<InputIt>>>
+  template<typename InputIt,
+           typename = stl::enable_if_t<stl::is_pointer_v<InputIt>>>
   iterator insert(const_iterator pos, InputIt first, InputIt last) {
     return insert_impl(pos, last - first, [&](size_type idx) {
       for (auto it = first; it != last; it++) {
@@ -398,7 +407,7 @@ class vector {
    * @param args arguments to construct the element from
    * @return iterator to the inserted element
    */
-  template <typename... Args>
+  template<typename... Args>
   iterator emplace(const_iterator pos, Args&&... args) {
     size_type idx = pos - begin();
     prep_for_insertion(idx, 1);
@@ -451,7 +460,7 @@ class vector {
    * @param args arguments to construct the new element
    * @return reference to the inserted element
    */
-  template <typename... Args>
+  template<typename... Args>
   reference emplace_back(Args&&... args) {
     auto it = emplace(end(), stl::forward<Args>(args)...);
     return data_[it - begin()];
@@ -529,7 +538,7 @@ class vector {
     }
   }
 
-  template <typename AssignFunc>
+  template<typename AssignFunc>
   void assign_impl(size_type count, AssignFunc&& assign_func) {
     if (capacity() < count) {
       realloc(count);
@@ -538,7 +547,7 @@ class vector {
     size_ = count;
   }
 
-  template <typename InsertFunc>
+  template<typename InsertFunc>
   iterator insert_impl(const_iterator pos, size_type count,
                        InsertFunc&& insert_func) {
     // must calculate idx first; otherwise, `pos` iterator
