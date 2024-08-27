@@ -1,3 +1,6 @@
 *_test
 .vscode/
 demo*
+build
+.DS_Store
+.cache
