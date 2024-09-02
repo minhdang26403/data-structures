@@ -3,17 +3,17 @@
 
 #include <algorithm>
 #include <functional>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include "linked_list.h"
+#include "list.h"
 #include "vector.h"
 
-namespace ds {
-template<typename KeyType, typename ValueType>
+namespace stl {
+template<typename K, typename V>
 struct Entry {
-  KeyType key_;
-  ValueType value_;
+  K key_;
+  V value_;
   /** Default construct */
   Entry() = default;
 
@@ -22,7 +22,7 @@ struct Entry {
    * @param key the key of the entry
    * @param value the value of the entry
    */
-  Entry(KeyType key, ValueType value) : key_(key), value_(value) {}
+  Entry(K key, V value) : key_(key), value_(value) {}
 
   /**
    * @param rhs the Entry to compare with
@@ -37,40 +37,43 @@ struct Entry {
   bool operator!=(const Entry& rhs) const { return !(*this == rhs); }
 };
 
-template<typename KeyType, typename ValueType>
-class HashTable {
+template<typename K, typename V>
+class hash_table {
  public:
-  using SizeType = std::size_t;
-  using EntryType = Entry<KeyType, ValueType>;
+  using size_type = std::size_t;
+  using entry_type = Entry<K, V>;
+
  public:
   /** Default constructor */
-  HashTable() : HashTable(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR) {}
+  hash_table() : hash_table(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR) {}
 
   /** Constructs a hash table with `capacity` buckets 
    * @param capacity the number of buckets of the hash table
    */
-  HashTable(SizeType capacity) : HashTable(capacity, DEFAULT_LOAD_FACTOR) {}
+  hash_table(size_type capacity) : hash_table(capacity, DEFAULT_LOAD_FACTOR) {}
 
   /**
-   * Construct a new Hash Table object
+   * Construct a new hash table object
    * @param capacity the number of buckets of the hash table
-   * @param load_factor the average number of elements per bucket (used for growing/shrinking table)
+   * @param load_factor the average number of elements per bucket
    */
-  HashTable(SizeType capacity, float load_factor) 
-    : capacity_(capacity), max_load_factor_(load_factor), table_(new LinkedList<EntryType>[capacity_]) {}
+  hash_table(size_type capacity, double load_factor)
+      : capacity_(capacity),
+        max_load_factor_(load_factor),
+        table_(new list<entry_type>[capacity_]) {}
 
   /** 
    * Copy constructor 
-   * @param other the source object to copy from
+   * @param other the source hash table to copy from
    */
-  HashTable(const HashTable& other) {
-    table_ = new LinkedList<EntryType>[other.capacity_];
+  hash_table(const hash_table& other) {
+    table_ = new list<entry_type>[other.capacity_];
     size_ = other.size_;
     capacity_ = other.capacity_;
     max_load_factor_ = other.max_load_factor_;
-    for (SizeType idx = 0; idx < capacity_; ++idx) {
+    for (size_type idx = 0; idx < capacity_; ++idx) {
       for (const auto& entry : other.table_[idx]) {
-        table_[idx].PushBack(entry);
+        table_[idx].push_back(entry);
       }
     }
   }
@@ -79,23 +82,19 @@ class HashTable {
    * Move constructor
    * @param other the source object to move from
    */
-  HashTable(HashTable&& other) {
-    other.Swap(*this);
-  }
+  hash_table(hash_table&& other) { other.swap(*this); }
 
   /** Destructor */
-  ~HashTable() {
-    delete [] table_;
-  }
+  ~hash_table() { delete[] table_; }
 
   /** 
    * Copy assignment 
    * @param other the source object to assign from
    * @return a reference to the assigned hash table
    */
-  HashTable& operator=(const HashTable& other) {
-    HashTable copy(other);
-    copy.Swap(*this);
+  hash_table& operator=(const hash_table& other) {
+    hash_table copy(other);
+    copy.swap(*this);
     return *this;
   }
 
@@ -104,43 +103,41 @@ class HashTable {
    * @param other the source object to move from
    * @return a reference to the assigned hash table
    */
-  HashTable& operator=(HashTable&& other) noexcept {
-    other.Swap(*this);
+  hash_table& operator=(hash_table&& other) noexcept {
+    other.swap(*this);
     return *this;
   }
-  
+
   /** @return the number of elements in the hash table */
-  SizeType Size() const { return size_; }
+  size_type size() const { return size_; }
 
   /** @return true if the hash table is empty; otherwise, false */
-  bool IsEmpty() const { return Size() == 0; }
+  bool empty() const { return size() == 0; }
 
   /** Insert a key (with default value) into the hash table.
    * If the key is already exists, modify the value of that key
    * @param key the key to insert
    */
-  void Insert(const KeyType& key) {
-    Insert(key, ValueType());
-  }
+  void insert(const K& key) { insert(key, V()); }
 
   /** Insert a key-value pair into the hash table.
    * If the key is already exists, modify the value of that key
    * @param key the key to insert
    * @param value the value of the key 
    */
-  void Insert(const KeyType& key, const ValueType& value) {
-    uint32_t index = KeyToIndex(key);
+  void insert(const K& key, const V& value) {
+    uint32_t index = key_to_index(key);
     for (auto& entry : table_[index]) {
       if (entry.key_ == key) {
         entry.value_ = value;
         return;
       }
     }
-    if (size_ > max_load_factor_*capacity_) {
-      GrowTable();
-      index = KeyToIndex(key);
+    if (size_ > max_load_factor_ * capacity_) {
+      grow_table();
+      index = key_to_index(key);
     }
-    table_[index].EmplaceFront(key, value);
+    table_[index].emplace_front(key, value);
     ++size_;
   }
 
@@ -148,11 +145,11 @@ class HashTable {
    * Deletes a key from the hash table
    * @param key the key to delete
    */
-  void Delete(const KeyType& key) {
-    uint32_t index = KeyToIndex(key);
-    for (auto &entry : table_[index]) {
+  void erase(const K& key) {
+    uint32_t index = key_to_index(key);
+    for (auto& entry : table_[index]) {
       if (entry.key_ == key) {
-        table_[index].Erase(entry);
+        table_[index].erase(entry);
         --size_;
         break;
       }
@@ -165,8 +162,8 @@ class HashTable {
    * @param key the key to get its value from
    * @return a reference to the value of that key
    */
-  ValueType& Get(const KeyType& key) {
-    uint32_t index = KeyToIndex(key);
+  V& get(const K& key) {
+    uint32_t index = key_to_index(key);
     for (auto& entry : table_[index]) {
       if (entry.key_ == key) {
         return entry.value_;
@@ -175,8 +172,8 @@ class HashTable {
     throw std::out_of_range("The key doesn't exist\n");
   }
 
-  ValueType& operator[](const KeyType& key) {
-    uint32_t index = KeyToIndex(key);
+  V& operator[](const K& key) {
+    uint32_t index = key_to_index(key);
     for (auto& entry : table_[index]) {
       if (entry.key_ == key) {
         return entry.value_;
@@ -189,11 +186,11 @@ class HashTable {
    * Retrieves all the keys from the hash table
    * @return a list of keys in the hash table
    */
-  Vector<KeyType> GetKeys() {
-    Vector<KeyType> keys;
-    for (SizeType idx = 0; idx < capacity_; ++idx) {
-      for (const auto &entry : table_[idx]) {
-        keys.PushBack(entry.key_);
+  vector<K> get_keys() {
+    vector<K> keys;
+    for (size_type idx = 0; idx < capacity_; ++idx) {
+      for (const auto& entry : table_[idx]) {
+        keys.push_back(entry.key_);
       }
     }
     return keys;
@@ -203,8 +200,8 @@ class HashTable {
    * @param key the key to check
    * @return true if the key exists; otherwise, false
    */
-  bool Contains(const KeyType& key) {
-    uint32_t index = KeyToIndex(key);
+  bool contains(const K& key) {
+    uint32_t index = key_to_index(key);
     for (const auto& entry : table_[index]) {
       if (entry.key_ == key) {
         return true;
@@ -217,14 +214,14 @@ class HashTable {
    * Converts the content of hash table to string
    * @return the hash table as string (i.e. [{key1, val1}, {key2, val2},...])
    */
-  std::string ToString() {
-    if (Size() == 0) {
+  std::string to_string() {
+    if (size() == 0) {
       return "[]";
     }
     std::stringstream ss;
     ss << "[";
-    for (SizeType idx = 0; idx < capacity_; ++idx) {
-      for (const auto &entry : table_[idx]) {
+    for (size_type idx = 0; idx < capacity_; ++idx) {
+      for (const auto& entry : table_[idx]) {
         ss << '{' << entry.key_ << ',' << entry.value_ << "}, ";
       }
     }
@@ -237,27 +234,26 @@ class HashTable {
   /**
    * Grows the hash table 
    */
-  void GrowTable() {
-    SizeType old_capacity = capacity_;
+  void grow_table() {
+    size_type old_capacity = capacity_;
     // Modify capacity first since it used for hashing
     capacity_ *= 2;
-    auto new_table = new LinkedList<EntryType>[capacity_];
-    for (SizeType idx = 0; idx < old_capacity; ++idx) {
-      for (const auto &entry : table_[idx]) {
-        uint32_t new_idx = KeyToIndex(entry.key_);
-        new_table[new_idx].PushFront(entry);
+    auto new_table = new list<entry_type>[capacity_];
+    for (size_type idx = 0; idx < old_capacity; ++idx) {
+      for (const auto& entry : table_[idx]) {
+        uint32_t new_idx = key_to_index(entry.key_);
+        new_table[new_idx].push_front(entry);
       }
     }
-    delete []table_;
+    delete[] table_;
     table_ = new_table;
   }
-
 
   /**
    * Swaps the content of two hash tables
    * @param rhs the other hash table to swap with
    */
-  void Swap(HashTable& rhs) {
+  void swap(hash_table& rhs) {
     using std::swap;
     swap(capacity_, rhs.capacity_);
     swap(max_load_factor_, rhs.max_load_factor_);
@@ -270,19 +266,18 @@ class HashTable {
    * @param key the key to convert
    * @return the index (bucket number)
    */
-  uint32_t KeyToIndex(KeyType key) {
-    return std::hash<KeyType>()(key) % capacity_;
-  }
-  
+  uint32_t key_to_index(K key) { return std::hash<K>()(key) % capacity_; }
+
   // The ratio between the number of elements and the number of bucket slots
-  static constexpr float DEFAULT_LOAD_FACTOR = 0.75;
+  static constexpr double DEFAULT_LOAD_FACTOR = 0.75;
   static constexpr uint32_t DEFAULT_CAPACITY = 8;
-  SizeType capacity_{DEFAULT_CAPACITY};
-  float max_load_factor_{DEFAULT_LOAD_FACTOR};
-  SizeType size_{0};
-  LinkedList<EntryType>* table_{};
+
+  size_type capacity_{DEFAULT_CAPACITY};
+  double max_load_factor_{DEFAULT_LOAD_FACTOR};
+  size_type size_{0};
+  list<entry_type>* table_{};
 };
 
-} // namespace ds
+}  // namespace stl
 
-#endif // HASH_TABLE_H_
+#endif  // HASH_TABLE_H_

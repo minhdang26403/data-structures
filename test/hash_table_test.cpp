@@ -1,115 +1,103 @@
 #include "hash_table.h"
 
-#include <cassert>
+#include <gtest/gtest.h>
 #include <exception>
-#include <iostream>
+#include <ranges>
 
-void Test1() {
-  std::cout << "-------Test 1-------\n";
-  ds::HashTable<int, int> hash_table;
-  for (int i = 0; i < 10; ++i) {
-    hash_table.Insert(i + 1, i + 1);
+using namespace stl;
+
+TEST(HashTableTest, TestBasic1) {
+  hash_table<int, int> hash_table;
+  for (int i : std::views::iota(1, 11)) {
+    hash_table.insert(i, i);
   }
-  std::cout << "Hash table: " << hash_table.ToString() << '\n';
+  EXPECT_TRUE(hash_table.size() == 10);
 
-  hash_table.Delete(2);
-  hash_table.Delete(6);
-  hash_table.Delete(4);
+  hash_table.erase(2);
+  hash_table.erase(6);
+  hash_table.erase(4);
 
-  assert(hash_table.Contains(1));
-  assert(!hash_table.Contains(2));
-  hash_table.Insert(5, 10);
-  std::cout << "Hash table: " << hash_table.ToString() << '\n';
-
+  EXPECT_TRUE(hash_table.contains(1));
+  EXPECT_TRUE(!hash_table.contains(2));
+  hash_table.insert(5, 10);
+  EXPECT_TRUE(hash_table.get(5) == 10);
 }
 
-void Test2() {
-  std::cout << "-------Test 2-------\n";
-  ds::HashTable<int, int> hash_table(4, 0.75);
+TEST(HashTableTest, TestBasic2) {
+  const size_t buckets = 4;
+  const double load_factor = 0.75;
+  hash_table<int, int> hash_table(buckets, load_factor);
 
-  for (int i = 0; i < 10; ++i) {
-    hash_table.Insert(i + 1, i + 1);
+  for (int i : std::views::iota(1, 11)) {
+    hash_table.insert(i, i);
   }
 
-  for (int i = 0; i < 10; ++i) {
-    if (i % 2 == 0) {
-      hash_table.Delete(i);
-    }
+  auto even = [](int i) {
+    return i % 2 == 0;
+  };
+
+  for (int i : std::views::iota(1, 11) | std::views::filter(even)) {
+    hash_table.erase(i);
   }
 
-  assert(hash_table.Contains(5));
-  assert(!hash_table.Contains(8));
-  assert(hash_table.Get(7) == 7);
-  // Get value from non-exist key returns default value
+  EXPECT_TRUE(hash_table.contains(5));
+  EXPECT_TRUE(!hash_table.contains(8));
+  EXPECT_TRUE(hash_table.get(7) == 7);
+
   try {
-    hash_table.Get(4);
-  } catch (const std::exception &e) {
-    std::cout << e.what();
+    hash_table.get(4);
+  } catch (const std::exception& e) {
+    EXPECT_TRUE(std::strcmp(e.what(), "The key doesn't exist\n") == 0);
   }
-
 }
 
-void Test3() {
-  std::cout << "-------Test 3-------\n";
-  ds::HashTable<int, int> hash_table1(4, 0.75);
+TEST(HashTableTest, TestConstructor) {
+  const size_t buckets = 4;
+  const double load_factor = 0.75;
+  hash_table<int, int> hash_table1(buckets, load_factor);
 
-  for (int i = 0; i < 10; ++i) {
-    hash_table1.Insert(i + 1, i + 1);
+  for (int i : std::views::iota(1, 11)) {
+    hash_table1.insert(i, i);
   }
 
+  hash_table<int, int> hash_table2(hash_table1);
+  for (int i : std::ranges::iota_view(1, 11)) {
+    hash_table2.contains(i);
+  }
 
-  ds::HashTable<int, int> hash_table2(hash_table1);
-  std::cout << "Hash table 1: " << hash_table1.ToString() << '\n';
-  std::cout << "Hash table 2: " << hash_table2.ToString() << '\n';
+  hash_table1.erase(1);
+  EXPECT_TRUE(hash_table1.size() != hash_table2.size());
+  EXPECT_TRUE(!hash_table1.contains(1));
+  EXPECT_TRUE(hash_table2.contains(1));
+  EXPECT_TRUE(hash_table1.get(2) == hash_table2.get(2));
+  hash_table1.insert(2, 20);
+  EXPECT_TRUE(hash_table1.get(2) != hash_table2.get(2));
 
-  hash_table1.Delete(1);
-  assert(hash_table1.Size() != hash_table2.Size());
-  assert(!hash_table1.Contains(1));
-  assert(hash_table2.Contains(1));
-  std::cout << "Hash table 1: " << hash_table1.ToString() << '\n';
-  std::cout << "Hash table 2: " << hash_table2.ToString() << '\n';
-
-  assert(hash_table1.Get(2) == hash_table2.Get(2));
-  hash_table1.Insert(2, 20);
-  assert(hash_table1.Get(2) != hash_table2.Get(2));
-  
-  // Can't use hash table 2 any more
-  ds::HashTable<int, int> hash_table3(std::move(hash_table2));
-  std::cout << "Hash table 2: " << hash_table2.ToString() << '\n';
-  std::cout << "Hash table 3: " << hash_table3.ToString() << '\n';
+  hash_table<int, int> hash_table3(stl::move(hash_table2));
+  EXPECT_TRUE(hash_table2.empty());
 }
 
-void Test4() {
-  std::cout << "-------Test 4-------\n";
-  ds::HashTable<int, int> hash_table1(2, 0.75);
+TEST(HashTableTest, TestAssignment) {
+  const size_t buckets = 2;
+  const double load_factor = 0.75;
+  hash_table<int, int> hash_table1(buckets, load_factor);
 
-  for (int i = 0; i < 10; ++i) {
-    hash_table1.Insert(i + 1, i + 1);
+  for (int i : std::views::iota(1, 11)) {
+    hash_table1.insert(i, i);
   }
 
-  ds::HashTable<int, int> hash_table2;
+  hash_table<int, int> hash_table2;
   hash_table2 = hash_table1;
-  std::cout << "Hash table 1: " << hash_table1.ToString() << '\n';
-  std::cout << "Hash table 2: " << hash_table2.ToString() << '\n';
-  assert(hash_table1.Get(1) == hash_table1.Get(1));
-  hash_table1.Delete(10);
-  assert(hash_table1.Size() != hash_table2.Size());
-  assert(!hash_table1.Contains(10));
-  assert(hash_table2.Contains(10));
+  for (int i : std::views::iota(1, 11)) {
+    EXPECT_TRUE(hash_table2.get(i) == hash_table1.get(i));
+  }
+  hash_table1.erase(10);
+  EXPECT_TRUE(hash_table1.size() != hash_table2.size());
+  EXPECT_TRUE(!hash_table1.contains(10));
+  EXPECT_TRUE(hash_table2.contains(10));
 
-  ds::HashTable<int, int> hash_table3;
-  hash_table3 = std::move(hash_table2);
-  std::cout << "Hash table 2: " << hash_table2.ToString() << '\n';
-  std::cout << "Hash table 3: " << hash_table3.ToString() << '\n';
-}
-
-int main() {
-  // Test1();
-  // Test2();
-  // Test3();
-  // Test4();
-
-  std::cout << "All test cases passed\n";
-
-  return 0;
+  hash_table<int, int> hash_table3;
+  hash_table3 = stl::move(hash_table2);
+  EXPECT_TRUE(!hash_table3.empty());
+  EXPECT_TRUE(hash_table2.empty());
 }
