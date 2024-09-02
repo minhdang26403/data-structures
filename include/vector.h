@@ -2,7 +2,6 @@
 #define VECTOR_H_
 
 #include <algorithm>
-#include <memory>
 #include <stdexcept>
 
 #include "type_traits.h"
@@ -17,7 +16,7 @@ namespace stl {
 template<typename T, typename Allocator = std::allocator<T>>
 class vector {
  public:
-  /*====================Member types====================*/
+  /*====================Member Types====================*/
   using value_type = T;
   using allocator_type = Allocator;
   using size_type = size_t;
@@ -30,11 +29,11 @@ class vector {
   using iterator = pointer;
   using const_iterator = const_pointer;
 
-  /*====================Member functions====================*/
+  /*====================Member Functions====================*/
 
   /**
    * Default constructor
-   * Constructs an empty container with a default-constructed allocator
+   * Construct an empty container with a default-constructed allocator
    */
   vector() noexcept(noexcept(Allocator()))
       : data_(std::allocator_traits<Allocator>::allocate(get_allocator(),
@@ -42,13 +41,13 @@ class vector {
         capacity_(INITIAL_CAPACITY) {}
 
   /**
-   * Constructs an empty container with the given allocator `alloc`
+   * Construct an empty container with the given allocator `alloc`
    * @param alloc custom allocator
    */
   explicit vector(const Allocator& alloc) noexcept : allocator_(alloc) {}
 
   /**
-   * Constructs the container with `count` copies of elements with value `value`
+   * Construct the container with `count` copies of elements with value `value`
    * @param count number of elements to initialize with
    * @param value value of these elements
    * @param alloc custom allocator
@@ -59,8 +58,7 @@ class vector {
   }
 
   /**
-   * Constructs the container with `count` default-inserted instances of T. No
-   * copies are made
+   * Construct the container with `count` default-inserted instances of T
    * @param count number of elements to initialize with
    * @param alloc custom allocator
    */
@@ -73,8 +71,8 @@ class vector {
         allocator_(alloc) {}
 
   /**
-   * Constructs the container with the contents of the range [first, last)
-   * Requires `enable_if_t` for overload resolution
+   * Construct the container with the contents of the range [first, last)
+   * Require `enable_if_t` for overload resolution
    * @param first iterator to the first element of the range
    * @param last iterator to one place beyond the last element
    */
@@ -87,13 +85,13 @@ class vector {
   }
 
   /**
-   * Copy constructor. Constructs the container with the contents of `other`
+   * Copy constructor. Construct the container with the contents of `other`
    * @param other source object to copy from
    */
   vector(const vector& other) : vector(other, other.get_allocator()) {}
 
   /**
-   * Copy constructor. Constructs the container with the contents of `other`,
+   * Copy constructor. Construct the container with the contents of `other`,
    * but using `alloc` as the allocator
    * @param other source object to copy from
    * @param alloc custom allocator
@@ -114,7 +112,7 @@ class vector {
   vector(vector&& other) noexcept { other.swap(*this); }
 
   /**
-   * Constructs the container with the contents of the initializer list `init`
+   * Construct the container with the contents of the initializer list `init`
    * @param init initializer list
    * @param alloc custom allocator
    */
@@ -133,7 +131,7 @@ class vector {
   }
 
   /**
-   * Copy assignment operator. Replaces the contents with the those of `other`
+   * Copy assignment operator. Replace the contents with the those of `other`
    * @param other source object to copy-assign from
    * @return reference to this vector object
    */
@@ -144,7 +142,7 @@ class vector {
   }
 
   /**
-   * Move assignment operator. Replaces the contents with those of `other` using
+   * Move assignment operator. Replace the contents with those of `other` using
    * move semantics
    * @param other source object to move from
    * @return reference to this vector object
@@ -156,7 +154,7 @@ class vector {
   }
 
   /**
-   * Replaces the contents with those of initializer list `ilist`
+   * Replace the contents with those of initializer list `ilist`
    * @param ilist source initialize list
    * @return reference to this vector object
    */
@@ -166,7 +164,7 @@ class vector {
   }
 
   /**
-   * Replaces the contents with `count` copies of `value`
+   * Replace the contents with `count` copies of `value`
    * @param count new size of the container
    * @param value value to initialize elements of the container with
    */
@@ -179,7 +177,7 @@ class vector {
   }
 
   /**
-   * Replaces the contents with copies of those in the range [first, last)
+   * Replace the contents with copies of those in the range [first, last)
    * @param first iterator to the first element of the range
    * @param last iterator to one place beyond the last element of the range
    */
@@ -193,7 +191,7 @@ class vector {
   }
 
   /**
-   * Replaces the contents with the elements from `ilist`
+   * Replace the contents with the elements from `ilist`
    * @param ilist initializer list to copy contents from
    */
   void assign(std::initializer_list<T> ilist) {
@@ -205,7 +203,7 @@ class vector {
   }
 
   /**
-   * Returns the allocator associated with the container
+   * Return the allocator associated with the container
    * @return the associated allocator
    */
   constexpr allocator_type get_allocator() const noexcept { return allocator_; }
@@ -213,7 +211,7 @@ class vector {
   /*==========Element access==========*/
 
   /**
-   * Returns a reference to the element at position `pos` with bound checking
+   * Return a reference to the element at position `pos` with bound checking
    * @param pos position of the element to return
    * @return reference to the requested element
    */
@@ -232,7 +230,7 @@ class vector {
   }
 
   /**
-   * Returns a reference to the element at position `pos`
+   * Return a reference to the element at position `pos`
    * @param pos position of the element to return
    * @return reference to the requested element
    */
@@ -241,7 +239,7 @@ class vector {
   const_reference operator[](size_type pos) const { return data_[pos]; }
 
   /**
-   * Returns a reference to the first element in the container
+   * Return a reference to the first element in the container
    * Calling `front` on an empty container causes undefined behavior
    * @return reference to the requested element
    */
@@ -250,7 +248,7 @@ class vector {
   const_reference front() const { return data_[0]; }
 
   /**
-   * Returns a reference to the last element in the container
+   * Return a reference to the last element in the container
    * Calling `back` on an empty container causes undefined behavior
    * @return reference to the requested element
    */
@@ -259,7 +257,7 @@ class vector {
   const_reference back() const { return data_[size() - 1]; }
 
   /**
-   * Returns a pointer to the underlying array
+   * Return a pointer to the underlying array
    * @return pointer to the underlying element storage
    */
   pointer data() noexcept { return data_; }
@@ -269,7 +267,7 @@ class vector {
   /*==========Iterators==========*/
 
   /**
-   * Returns an iterator to the first element of the vector
+   * Return an iterator to the first element of the vector
    * @return iterator to the first element
    */
   iterator begin() noexcept { return static_cast<iterator>(data()); }
@@ -281,7 +279,7 @@ class vector {
   const_iterator cbegin() const noexcept { return begin(); }
 
   /**
-   * Returns an iterator to the element following the last element of the
+   * Return an iterator to the element following the last element of the
    * vector. This element acts as a placeholder; attempting to access it results
    * in undefined behavior.
    * @return iterator to the element following the last element of the vector
@@ -296,19 +294,19 @@ class vector {
 
   /*==========Capacity==========*/
   /**
-   * Checks whether the container has no elements
+   * Check whether the container has no elements
    * @return true if the container is empty, false otherwise
    */
   bool empty() const noexcept { return size() == 0; }
 
   /**
-   * Returns the number of elements in the container
+   * Return the number of elements in the container
    * @return the number of elements in the container
    */
   size_type size() const noexcept { return size_; }
 
   /**
-   * Increases the capacity of the vector to a value greater than or equal to
+   * Increase the capacity of the vector to a value greater than or equal to
    * `new_cap`. If `new_cap` is greater than the current capacity, new storage
    * is allocated, otherwise the function does nothing.
    * Iterators and references to elements of the container are invalidated
@@ -322,7 +320,7 @@ class vector {
   }
 
   /**
-   * Returns the capacity of the vector (the total number of elements that
+   * Return the capacity of the vector (the total number of elements that
    * the vector can hold without requiring reallocation)
    * @return capacity of the vector
    */
@@ -330,14 +328,14 @@ class vector {
 
   /*==========Modifiers==========*/
   /**
-   * Erases all elements from the container
+   * Erase all elements from the container
    * Invalidates any references, pointers, or iterators referring to contained
    * elements (including past-the-end iterators)
    */
   void clear() noexcept { size_ = 0; }
 
   /**
-   * Inserts `value` at `pos`
+   * Insert `value` at `pos`
    * @param pos position to insert value
    * @param value value to insert
    * @return iterator to the inserted `value`
@@ -355,7 +353,7 @@ class vector {
   }
 
   /**
-   * Inserts `count` copies of `value` at `pos`
+   * Insert `count` copies of `value` at `pos`
    * @param pos position to insert value
    * @param count number of values to insert
    * @param value value to insert
@@ -370,7 +368,7 @@ class vector {
   }
 
   /**
-   * Inserts elements from the range [first, last) at `pos`
+   * Insert elements from the range [first, last) at `pos`
    * @param pos position to insert value
    * @param first the first element of the range
    * @param last the element following the last element of the range
@@ -387,7 +385,7 @@ class vector {
   }
 
   /**
-   * Inserts elements from the initializer list `ilist` at `pos`
+   * Insert elements from the initializer list `ilist` at `pos`
    * @param pos position to insert value
    * @param ilist initializer list to insert values from
    * @return iterator to the first inserted element, or `pos` if `ilist` is
@@ -419,7 +417,7 @@ class vector {
   }
 
   /**
-   * Removes the element at `pos`
+   * Remove the element at `pos`
    * @param pos position of the element to remove
    * @return iterator following the last removed element
    */
@@ -438,7 +436,7 @@ class vector {
   }
 
   /**
-   * Appends the given `value` to the end of the container. The new element is
+   * Append the given `value` to the end of the container. The new element is
    * initialized of a copy of `value`. Iterators and references to elements are
    * invalidated if reallocation takes place
    * @param value value of the element to append
@@ -446,7 +444,7 @@ class vector {
   void push_back(const T& value) { insert(end(), value); }
 
   /**
-   * Appends the given `value` to the end of the container. `value` is moved to
+   * Append the given `value` to the end of the container. `value` is moved to
    * the new element. Iterators and references to elements are invalidated if
    * reallocation takes place
    * @param value value of the element to append
@@ -454,7 +452,7 @@ class vector {
   void push_back(T&& value) { insert(end(), stl::move(value)); }
 
   /**
-   * Appends a new element to the end of the container using in-place
+   * Append a new element to the end of the container using in-place
    * construction. Iterators and references to elements are invalidated if
    * reallocation takes place
    * @param args arguments to construct the new element
@@ -467,13 +465,13 @@ class vector {
   }
 
   /**
-   * Removes the last element from the container. Calling this function on an
+   * Remove the last element from the container. Calling this function on an
    * empty container causes undefined behavior.
    */
   void pop_back() { size_--; }
 
   /**
-   * Resizes the container to contain `count` elements
+   * Resize the container to contain `count` elements
    * @param count the new size of the container
    */
   void resize(size_type count) { resize_impl(count, value_type()); }
@@ -556,7 +554,7 @@ class vector {
     if (count == 0) {
       return static_cast<iterator>(data_ + idx);
     }
-    // prep_for_insertion can invalidate iterator
+    // prep_for_insertion can invalidate iterator `pos`
     prep_for_insertion(idx, count);
     insert_func(idx);
     size_ += count;

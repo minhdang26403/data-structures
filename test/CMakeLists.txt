@@ -1,5 +1,7 @@
 set(TESTS
+  hash_table_test
   list_test
+  queue_test
   stack_test
   vector_test
 )

@@ -1,26 +1,16 @@
 #include "queue.h"
 
-#include <cassert>
-#include <iostream>
+#include <gtest/gtest.h>
 
-void Test1() {
-  std::cout << "-------Test 1-------\n";
-  ds::Queue<int> q;
-  q.Enqueue(1);
-  q.Enqueue(2);
-  q.Enqueue(3);
-  assert(q.Size() == 3);
-  assert(q.Front() == 1);
-  assert(q.Back() == 3);
+TEST(QueueTest, BasicTest) {
+  stl::queue<int> q;
+  q.enqueue(1);
+  q.enqueue(2);
+  q.enqueue(3);
+  EXPECT_TRUE(q.size() == 3);
+  EXPECT_TRUE(q.front() == 1);
+  EXPECT_TRUE(q.back() == 3);
 
-  q.Dequeue();
-  assert(q.Front() == 2);
-}
-
-int main() {
-  Test1();
-
-  std::cout << "All test cases passed\n";
-
-  return 0;
+  q.deque();
+  EXPECT_TRUE(q.front() == 2);
 }

@@ -1,80 +1,89 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#include "linked_list.h"
+#include "list.h"
 
-namespace ds {
-template<typename Type>
-class Queue {
+namespace stl {
+template<typename T>
+class queue {
  public:
-  using ValueType = Type;
-  using SizeType = std::size_t;
-  using Reference = ValueType&;
-  using ConstReference = const ValueType&;
+  using value_type = T;
+  using size_type = std::size_t;
+  using reference = value_type&;
+  using const_reference = const value_type&;
+
  public:
-  Queue() = default;
-  Queue(const Queue& other) = default;
-  Queue(Queue&& other) noexcept = default;
-  Queue& operator=(const Queue& other) = default;
-  Queue& operator=(Queue&& other) = default;
-  ~Queue() = default;
+  queue() = default;
+  queue(const queue& other) = default;
+  queue(queue&& other) noexcept = default;
+  queue& operator=(const queue& other) = default;
+  queue& operator=(queue&& other) = default;
+  ~queue() = default;
 
   /** @return the current number of elements in the queue */
-  SizeType Size() const { return queue_.Size(); }
+  size_type size() const { return queue_.size(); }
 
   /** @return true if the queue is empty; otherwise, false. */
-  bool IsEmpty() const { return queue_.Size() == 0; }
+  bool empty() const { return queue_.size() == 0; }
 
   /** @return a reference to the first element in the queue */
-  Reference Front() {
-    CheckQueue();
-    return queue_.Front();
+  reference front() {
+    check_queue();
+    return queue_.front();
   }
 
-  ConstReference Front() const {
-    CheckQueue();
-    return queue_.Front();
+  /** @return a constant reference to the first element in the queue */
+  const_reference front() const {
+    check_queue();
+    return queue_.front();
   }
 
-  /** @return a reference to the first element in the queue */
-  Reference Back() {
-    CheckQueue();
-    return queue_.Back();
+  /** @return a reference to the last element in the queue */
+  reference back() {
+    check_queue();
+    return queue_.back();
   }
 
-  ConstReference Back() const {
-    CheckQueue();
-    return queue_.Back();
+  /** @return a constant reference to the last element in the queue */
+  const_reference back() const {
+    check_queue();
+    return queue_.back();
   }
 
   /**
-   * Pushes the given element to the end of the queue
+   * Pushes the given element to the end of the queue. Copy-construct
+   * the pushed element.
    * @param value the value of the element to push
    */
-  void Enqueue(const Type& value) {
-    queue_.PushBack(value);
-  }
+  void enqueue(const T& value) { queue_.push_back(value); }
 
-  void Enqueue(Type&& value) {
-    queue_.PushBack(std::move(value));
-  }
+  /**
+   * Pushes the given element to the end of the queue. Move-construct
+   * the pushed element.
+   * @param value the value of the element to push
+   */
+  void enqueue(T&& value) { queue_.push_back(stl::move(value)); }
 
-  /** Removes an element from the front of the queue */
-  Type Dequeue() {
-    CheckQueue();
-    Type ele = queue_.Front();
-    queue_.PopFront();
+  /**
+   * Removes an element from the front of the queue
+   * @return the element at the front of the queue
+   */
+  T deque() {
+    check_queue();
+    T ele = queue_.front();
+    queue_.pop_front();
     return ele;
   }
 
  private:
-  void CheckQueue() {
-    if (IsEmpty()) {
+  void check_queue() {
+    if (empty()) {
       throw std::out_of_range("The queue is empty.");
     }
   }
-  LinkedList<Type> queue_;
-};
-} // namespace ds
 
-#endif // QUEUE_H_
+  list<T> queue_;
+};
+}  // namespace stl
+
+#endif  // QUEUE_H_
