@@ -1,6 +1,8 @@
 set(TESTS
+  fft_test
   hash_table_test
   list_test
+  matrix_multiplication_test
   queue_test
   stack_test
   vector_test
